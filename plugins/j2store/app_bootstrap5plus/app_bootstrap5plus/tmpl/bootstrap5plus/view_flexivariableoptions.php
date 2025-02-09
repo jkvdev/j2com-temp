@@ -1,0 +1,223 @@
+<?php
+
+/**
+ * @package J2Store
+ * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @license GNU GPL v3 or later
+ */
+
+// Import Joomla packages
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
+
+// No direct access
+defined('_JEXEC') or die;
+
+// Get options
+$options = isset($this->product->options)
+  && !empty($this->product->options)
+  ? $this->product->options : array();
+
+// Initialize variant name
+$variant_name = array();
+
+// If variant exists
+if (
+  isset($this->product->variant->variant_name)
+  && $this->product->variant->variant_name
+) {
+  // Split the variant name into the array
+  $variant_name = explode(',', $this->product->variant->variant_name);
+}
+
+// If there are options
+if ($options): ?>
+  <!-- Main options DIV -->
+  <div
+    class="options"
+    id="variable-options-<?= $this->product->j2store_product_id ?>">
+    <?php
+
+    // Loop over product options
+    foreach ($options as $option_key => $option):
+
+      // Initialize default option value id
+      $default_option_value_id = '';
+
+      // Loop over each option 
+      foreach ($option['optionvalue'] as $o_value) {
+        // Check if it matches the variant name
+        if (
+          isset($variant_name[$option_key])
+          && isset($o_value['product_optionvalue_id'])
+          && $variant_name[$option_key] == $o_value['product_optionvalue_id']
+        ) {
+          // If it matches, store value
+          $default_option_value_id = $o_value['optionvalue_id'];
+
+          // End Loop
+          break;
+        }
+      }
+
+      // Initialize option name
+      $default_option_value_name = '';
+      // Initialize count
+      $option_count = 0;
+
+      // Run before option plugins
+      echo J2Store::plugin()->eventWithHtml(
+        'BeforeDisplaySingleProductOption',
+        array(
+          $this->product,
+          &$option
+        )
+      );
+
+      // If option is a select dropdown menu
+      if ($option['type'] == 'select') : ?>
+        <!-- Main select DIV -->
+        <div
+          id="option-<?= $option['productoption_id']; ?>"
+          class="option">
+          <?php
+
+          // If required
+          if ($option['required']) : ?>
+            <!-- Required span -->
+            <span class="required">*</span>
+          <?php endif; ?>
+
+          <!-- Option text in bold -->
+          <b>
+            <?= $this->escape(Text::_(
+              $option['option_name']
+            )); ?>:
+          </b>
+
+          <!-- Break -->
+          <br>
+
+          <!-- Select dropdown menu -->
+          <select
+            name="product_option[<?= $option['productoption_id']; ?>]"
+            onChange="doFlexiAjaxPrice(
+                            <?= $this->product->j2store_product_id ?>,
+                                '#option-<?= $option["productoption_id"]; ?>'
+                                )">
+            <!-- Default option -->
+            <option value="*">
+              <!-- Text -->
+              <?= stripslashes($this->escape(Text::_('J2STORE_CHOOSE'))); ?>
+            </option>
+
+            <?php
+            // 
+            foreach ($option['option_value'] as $option_value):
+
+              // Set checked state to empty
+              $checked = '';
+
+              // If set by default, set checked
+              if ($default_option_value_id == $option_value->j2store_optionvalue_id) $checked = 'selected="selected"'; ?>
+              <!-- Render option -->
+              <option
+                <?= $checked; ?>
+                value="<?= $option_value->j2store_optionvalue_id; ?>">
+                <!-- Option text -->
+                <?= stripslashes($this->escape(Text::_(
+                  $option_value->optionvalue_name
+                ))); ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <br>
+      <?php endif;
+
+      // If option is a radio button
+      if ($option['type'] == 'radio'): ?>
+        <!-- Main radio DIV -->
+        <div
+          id="option-<?= $option['productoption_id']; ?>"
+          class="option">
+          <?php
+
+          // If required
+          if ($option['required']): ?>
+            <!-- Required span -->
+            <span class="required">*</span>
+          <?php endif; ?>
+
+          <!-- Option text in bold -->
+          <b><?= $this->escape(Text::_($option['option_name'])); ?>:</b>
+
+          <!-- Break -->
+          <br>
+
+          <?php
+          // Loop over option values
+          foreach ($option['option_value'] as $option_value) :
+
+            // Set is checked state to empty
+            $checked = '';
+
+            // If set by default set to checked
+            if (
+              $default_option_value_id
+              == $option_value->j2store_optionvalue_id
+            ) $checked = 'checked="checked"'; ?>
+
+            <!-- Radio Input -->
+            <input
+              <?= $checked; ?>
+              type="radio"
+              name="product_option[<?= $option['productoption_id']; ?>]"
+              autocomplete="off"
+              onClick="doFlexiAjaxPrice(
+                  <?= $this->product->j2store_product_id ?>,
+                  '#option-<?= $option["productoption_id"]; ?>'
+                );"
+              value="<?= $option_value->j2store_optionvalue_id; ?>"
+              id="option-value-<?= $option_value->j2store_optionvalue_id; ?>"
+              data-product_id="<?= $this->product->j2store_product_id ?>" />
+            <?php
+
+            // If option has an image
+            if (
+              $this->params->get('image_for_product_options', 0) &&
+              isset($option_value->optionvalue_image) &&
+              !empty($option_value->optionvalue_image)
+            ):
+            ?>
+              <!-- Option Image -->
+              <img
+                class="optionvalue-image-<?= $option['productoption_id']; ?>-<?= $option_value->j2store_optionvalue_id; ?>"
+                src="<?= Uri::root(true) . '/' . $option_value->optionvalue_image; ?>" />
+            <?php endif; ?>
+
+            <!-- Radio Label -->
+            <label
+              for="option-value-<?= $option_value->j2store_optionvalue_id; ?>">
+              <!-- Label text -->
+              <?= stripslashes($this->escape(Text::_(
+                $option_value->optionvalue_name
+              ))); ?>
+            </label>
+            <br>
+          <?php endforeach; ?>
+        </div>
+        <br>
+    <?php endif;
+
+      // Run after option display plugins
+      echo J2Store::plugin()->eventWithHtml(
+        'AfterDisplaySingleProductOption',
+        array(
+          $this->product,
+          $option
+        )
+      );
+    endforeach; ?>
+  </div>
+<?php endif; ?>
