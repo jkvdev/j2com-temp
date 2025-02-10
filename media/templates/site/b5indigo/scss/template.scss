@@ -4,6 +4,15 @@
 // Load our local copy of Bootstrap 5.3.2
 @import "vendor/bootstrap-5.3.2/functions";
 @import "vendor/bootstrap-5.3.2/variables";
+
+// Add custom breakpoint
+$grid-breakpoints: map-merge(
+  $grid-breakpoints,
+  (
+    3xl: 1536px,
+  )
+);
+
 @import "vendor/bootstrap-5.3.2/bootstrap";
 
 // Import this file to make columns work in com_content
@@ -11,10 +20,11 @@
 
 //Your Imports Here
 
-//Your CSS Here
-// body {
-//   background-color: gray;
-// }
+@include media-breakpoint-up(3xl) {
+  .container {
+    max-width: 1400px;
+  }
+}
 
 //Basic Responsive Images
 img {
@@ -27,16 +37,15 @@ img {
   a,
   span,
   .breadcrumb-item + .breadcrumb-item::before {
-    color: white !important;
+    color: $primary !important;
   }
 }
 
-// Main section
-main {
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-}
-
-body {
-  background-color: rgb(251, 251, 245) !important; /* Classic beige */
+// extra break point
+@media (min-width: 1640px) {
+  .container-3xl {
+    max-width: 1560px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }

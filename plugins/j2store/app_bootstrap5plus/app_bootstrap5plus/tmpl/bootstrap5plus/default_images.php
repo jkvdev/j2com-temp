@@ -29,7 +29,7 @@ if ($this->params->get('list_show_image', 1)):
             <!-- Main Thumbnail Image Div -->
             <div
                 class="j2store-thumbnail-image w-100 h-100 d-flex justify-content-center align-center"
-                style="max-width: 300px; max-height: 200px;">
+                style="max-width: 360px; max-height: 200px;">
                 <?php
                 // Retrieving Thumbnail image path
                 $thumb_image = $platform->getImagePath($this->product->thumb_image);

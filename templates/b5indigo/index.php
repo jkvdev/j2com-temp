@@ -19,20 +19,32 @@ use Joomla\CMS\Uri\Uri; // Uri class: Contains static methods to manipulate URIs
 
 /** @var Joomla\CMS\Document\HtmlDocument $this */
 
+// Get Joomla Application
 $app = Factory::getApplication();
-$wa  = $this->getWebAssetManager();  // Get the Web Asset Manager - used to load our CSS and JS files
+// Get the Web Asset Manager - used to load CSS and JS files
+$wa  = $this->getWebAssetManager();
 
 // Add Favicon from images folder
-$this->addHeadLink(HTMLHelper::_('image', 'favicon.ico', '', [], true, 1), 'icon', 'rel', ['type' => 'image/x-icon']);
+$this->addHeadLink(HTMLHelper::_(
+  'image',
+  'favicon.ico',
+  '',
+  [],
+  true,
+  1
+), 'icon', 'rel', [
+  'type' => 'image/x-icon'
+]);
 
 
-// Detecting Active Variables
+// Detecting Active Page Variables
 $option   = $app->input->getCmd('option', '');
 $view     = $app->input->getCmd('view', '');
 $layout   = $app->input->getCmd('layout', '');
 $task     = $app->input->getCmd('task', '');
 $itemid   = $app->input->getCmd('Itemid', '');
 $sitename = htmlspecialchars($app->get('sitename'), ENT_QUOTES, 'UTF-8');
+// Gets the menu but should be done only in the frontend
 $menu     = $app->getMenu()->getActive();
 $pageclass = $menu !== null ? $menu->getParams()->get('pageclass_sfx', '') : '';
 
@@ -57,7 +69,7 @@ HTMLHelper::_('bootstrap.dropdown');
 //HTMLHelper::_('bootstrap.framework');
 
 
-//Register our web assets (Css/JS) with the Web Asset Manager
+//Register web assets (Css/JS) with the Web Asset Manager
 //The files are defined in joomla.asset.json!!! If you don't want to use the included CSS or JS, just remove these lines or replace the CSS/JS files with your own code!
 $wa->useStyle('template.b5indigo.mainstyles');
 $wa->useStyle('template.b5indigo.user');
@@ -71,103 +83,133 @@ $this->setMetaData('viewport', 'width=device-width, initial-scale=1');
 <?php // Everything below here is the actual "template" part of the template. Where we put our HTML code for the layout and such. 
 ?>
 <!DOCTYPE html>
-<html lang="<?php echo $this->language; ?>" dir="<?php echo $this->direction; ?>">
+<html
+  lang="<?= $this->language; ?>"
+  dir="<?= $this->direction; ?>">
 
 <head>
 
-    <?php // Loads important metadata like the page title and viewport scaling 
-    ?>
-    <jdoc:include type="metas" />
+  <?php // Loads important metadata like the page title and viewport scaling 
+  ?>
+  <jdoc:include type="metas" />
 
-    <?php // Loads the site's CSS and JS files from web asset manager 
-    ?>
-    <jdoc:include type="styles" />
-    <jdoc:include type="scripts" />
+  <?php // Loads the site's CSS and JS files from web asset manager 
+  ?>
+  <jdoc:include type="styles" />
+  <jdoc:include type="scripts" />
 
-    <?php /** You can put links to CSS/JS just like any regular HTML page here too, and remove the jdoc:include script/style lines above if you want.
-     * Do not delete the metas line though
-     * 
-     * For example, if you want to manually link to a custom stylesheet or script, you can do it like this:
-     * <link rel="stylesheet" href="https://mysite.com/templates/mytemplate/mycss.css" type="text/css" />
-     * <script src="https://mysite.com/templates/mytemplate/myscript.js"></script>
-     * */
-    ?>
+  <?php /** You can put links to CSS/JS just like any regular HTML page here too, and remove the jdoc:include script/style lines above if you want.
+   * Do not delete the metas line though
+   * 
+   * For example, if you want to manually link to a custom stylesheet or script, you can do it like this:
+   * <link rel="stylesheet" href="https://mysite.com/templates/mytemplate/mycss.css" type="text/css" />
+   * <script src="https://mysite.com/templates/mytemplate/myscript.js"></script>
+   * */
+  ?>
 
 </head>
 
 <?php // you can change data-bs-theme to dark for dark mode  // 
 ?>
 
-<body class="site <?= $pageclass; ?>" data-bs-theme="light">
+<body
+  class="site <?= $pageclass; ?>"
+  data-bs-theme="light">
 
-    <!-- Header with Title -->
-    <header class='bg-black pb-1 pt-5 fs-1 fw-semibold'>
-        <div class='container'>
-            <span class='ps-2'><a href="index.php" class="navbar-brand text-white"><?= ($sitename); ?></a></span>
-        </div>
-    </header>
+  <!-- Main Header and navigation -->
+  <div class="container-fluid">
+    <!-- Keep the navigation in a container -->
+    <div class="container d-flex flex-row justify-content-between align-items-center py-3">
+      <!-- Header with Title -->
+      <header class='fs-2 fw-semibold'>
+        <!-- Site Name -->
+        <span class=''>
+          <!-- Redirect Link -->
+          <a
+            href="index.php"
+            class="navbar-brand text-black">
+            <!-- Text -->
+            <?= ($sitename); ?>
+          </a>
+        </span>
+      </header>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-dark bg-dark bg-gradient navbar-expand-lg">
-        <div class="container">
+      <!-- Navbar -->
+      <nav class="navbar navbar-expand-lg fw-medium text-primary">
 
-            <?php // Update 1.14 - Added support for mobile menu with bootstrap 
-            ?>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainmenu" aria-controls="mainmenu" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <?php // Put menu links in the navbar - main menu must be in the "menu" position!!! Only supports top level and 1 down, so no more than 1 level of child items 
-            ?>
-            <?php if ($this->countModules('menu')): ?>
-                <div class="collapse navbar-collapse" id="mainmenu">
-                    <jdoc:include type="modules" name="menu" style="none" />
-                </div>
-            <?php endif; ?>
-        </div>
-    </nav>
+        <?php // Update 1.14 - Added support for mobile menu with bootstrap 
+        ?>
+        <!-- Burger Menu -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#mainmenu"
+          aria-controls="mainmenu"
+          aria-expanded="false"
+          aria-label="Toggle navigation">
 
-    <!-- Include breadcrumbs -->
-    <?php if ($this->countModules('breadcrumbs')): ?>
-        <div class="bg-primary text-white link-white">
-            <div class="container">
-                <jdoc:include type="modules" name="breadcrumbs" style="none" />
-            </div>
-        </div>
-    <?php endif; ?>
+          <!-- Menu Icon -->
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-    <!-- Main Content Area -->
-    <div class="container">
-        <div class="row">
-            <div class="col-12 col-lg">
-                <main class="px-4 py-3 bg-white">
-                    <jdoc:include type="message" />
-                    <jdoc:include type="component" />
-                </main>
-            </div>
-            <?php if ($this->countModules('sidebar')): ?>
-                <div class="col-12 col-lg-3">
-                    <jdoc:include type="modules" name="sidebar" style="none" />
-                </div>
-            <?php endif; ?>
-        </div>
+        <?php // Put menu links in the navbar - main menu must be in the "menu" position!!! Only supports top level and 1 down, so no more than 1 level of child items 
+
+        // If any module is assigned the menu position
+        if ($this->countModules('menu')): ?>
+          <div
+            class="collapse navbar-collapse"
+            id="mainmenu">
+            <jdoc:include type="modules" name="menu" style="none" />
+          </div>
+        <?php endif; ?>
+
+      </nav>
     </div>
+  </div>
 
-    <!-- Footer -->
-    <div class="bg-black text-white mt-5">
-        <div class="container">
-            <footer class='p-3'>
-                <span>&copy; 2025 Valentin Costea</span>
-                <!-- <?php if ($this->countModules('footer')): ?>
+  <!-- Include breadcrumbs -->
+  <?php if ($this->countModules('breadcrumbs')): ?>
+    <div class="bg-light text-dark m-0 p-0">
+      <div class="container">
+        <jdoc:include type="modules" name="breadcrumbs" style="none" />
+      </div>
+    </div>
+  <?php endif; ?>
+
+  <!-- Main Content Area -->
+  <div class="container">
+    <div class="row">
+      <div class="col-12 col-lg">
+        <main class="py-5">
+          <jdoc:include type="message" />
+          <jdoc:include type="component" />
+        </main>
+      </div>
+      <?php if ($this->countModules('sidebar')): ?>
+        <div class="col-12 col-lg-3">
+          <jdoc:include type="modules" name="sidebar" style="none" />
+        </div>
+      <?php endif; ?>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="bg-dark text-white mt-5">
+    <div class="container">
+      <footer class='p-3'>
+        <span>&copy; 2025 Valentin Costea</span>
+        <!-- <?php if ($this->countModules('footer')): ?>
                     <jdoc:include type="modules" name="footer" style="none" />
                 <?php endif; ?> -->
-            </footer>
-        </div>
+      </footer>
     </div>
+  </div>
 
 
-    <?php // Include any debugging info 
-    ?>
-    <jdoc:include type="modules" name="debug" style="none" />
+  <?php // Include any debugging info 
+  ?>
+  <jdoc:include type="modules" name="debug" style="none" />
 </body>
 
 </html>
