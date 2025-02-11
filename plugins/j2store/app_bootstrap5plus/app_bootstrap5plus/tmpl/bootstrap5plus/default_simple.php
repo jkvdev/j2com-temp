@@ -50,13 +50,19 @@ echo $images; ?>
 		}
 
 		// Check whether to show SKU or not
-		if ($this->params->get('list_show_product_sku', 1) && J2Store::product()->canShowSku($this->params)) {
+		if (
+			$this->params->get('list_show_product_sku', 1)
+			&& J2Store::product()->canShowSku($this->params)
+		) {
 			// Load SKU template
 			echo $this->loadTemplate('sku');
 		}
 
 		// Check whether or not to show the product stock
-		if ($this->params->get('list_show_product_stock', 1) && J2Store::product()->managing_stock($this->product->variant)) {
+		if (
+			$this->params->get('list_show_product_stock', 1)
+			&& J2Store::product()->managing_stock($this->product->variant)
+		) {
 			// Load the product stock template
 			echo $this->loadTemplate('stock');
 		} ?>
@@ -91,7 +97,13 @@ echo $images; ?>
 				echo $this->loadTemplate('cart');
 
 			// If the cart is of type 2 & 3
-			elseif (($cart_type == 2 && count($this->product->options)) || $cart_type == 3): ?>
+			elseif (
+				(
+					$cart_type == 2
+					&& count($this->product->options)
+				)
+				|| $cart_type == 3
+			): ?>
 				<!-- Redirect to product details page -->
 				<!-- Render Link -->
 				<a

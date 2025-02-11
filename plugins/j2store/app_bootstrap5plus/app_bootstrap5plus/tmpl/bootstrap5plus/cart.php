@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -57,4 +57,10 @@ echo J2Store::plugin()->eventWithHtml(
 
 <?php
 // Allow Plugins to load content after the button
-echo J2Store::plugin()->eventWithHtml('AfterAddToCartButton', array($product, J2Store::utilities()->getContext('cart'))); ?>
+echo J2Store::plugin()->eventWithHtml(
+	'AfterAddToCartButton',
+	array(
+		$product,
+		J2Store::utilities()->getContext('cart')
+	)
+); ?>

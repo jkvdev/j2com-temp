@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -15,7 +15,14 @@ defined('_JEXEC') or die;
 // Load the images template
 $images = $this->loadTemplate('images');
 // Event Handler: Trigger Joomla Plugins before rendering images
-J2Store::plugin()->event('BeforeDisplayImages', array(&$images, $this, 'com_j2store.products.list.bootstrap'));
+J2Store::plugin()->event(
+	'BeforeDisplayImages',
+	array(
+		&$images,
+		$this,
+		'com_j2store.products.list.bootstrap'
+	)
+);
 // Render Images
 echo $images;
 
@@ -28,7 +35,7 @@ if (isset($this->product->event->afterDisplayTitle)) {
 	echo $this->product->event->afterDisplayTitle;
 }
 
-// Check if there are any Joomla Plugins before the description
+// Check if there are any Joomla Plugins before the content
 if (isset($this->product->event->beforeDisplayContent)) {
 	// Render the plugins
 	echo $this->product->event->beforeDisplayContent;

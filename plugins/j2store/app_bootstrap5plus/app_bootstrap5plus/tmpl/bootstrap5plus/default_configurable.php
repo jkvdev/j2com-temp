@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -37,7 +37,7 @@ if (isset($this->product->event->afterDisplayTitle)) {
 	echo $this->product->event->afterDisplayTitle;
 }
 
-// If a plugin modifies the title before display
+// If a plugin modifies the content before display
 if (isset($this->product->event->beforeDisplayContent)) {
 	// Run plugin
 	echo $this->product->event->beforeDisplayContent;

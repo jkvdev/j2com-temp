@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -82,6 +82,7 @@ if (
 		if ($params->get('display_price_with_tax_info', 0)): ?>
 			<!-- Tax Information -->
 			<div class="tax-text">
+				<!-- Text -->
 				<?= J2Store::product()->get_tax_text(); ?>
 			</div>
 		<?php endif; ?>

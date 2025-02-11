@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  *
  * Bootstrap 2 layout of products
@@ -19,13 +19,16 @@ defined('_JEXEC') or die;
 // Initializing J2STore
 $platform = J2Store::platform();
 // Get Joomla Application Instance
-$app = $platform->application();
+// $app = $platform->application();
 // Retrieve Joomla document object for managing scripts and styles
-$document = $app->getDocument();
+// $document = $app->getDocument();
 
 // Load JavaScript File from the Media Folder
 // TODO: search the media folder
-$platform->addScript('j2store-filter', '/media/j2store/js/filter.js');
+$platform->addScript(
+	'j2store-filter',
+	'/media/j2store/js/filter.js'
+);
 
 // Construct url parameters for the active menu
 $url_params = array();
@@ -34,15 +37,21 @@ $active_link = $platform->getProductUrl($url_params);
 
 // If there is an active menu item, add its ID to the URL
 if (isset($this->active_menu->id)) {
+	// Get item id
 	$item_id = $this->active_menu->id;
+	// set url params to active menu id
 	$url_params['Itemid'] = $this->active_menu->id;
+	// get the active link
 	$active_link = $platform->getProductUrl($url_params);
 }
 
 // Store the active Link
 $actionURL = $active_link;
 // Retrieve filter position settings
-$filter_position = $this->params->get('list_filter_position', 'right');
+$filter_position = $this->params->get(
+	'list_filter_position',
+	'right'
+);
 ?>
 
 <!-- Main Div for the product list -->
@@ -54,7 +63,10 @@ $filter_position = $this->params->get('list_filter_position', 'right');
 	<?php
 	// Load Joomla Modules and Page Content
 	// Load Plugins
-	echo J2Store::plugin()->eventWithHtml('BeforeViewProductListDisplay', array($this->products));
+	echo J2Store::plugin()->eventWithHtml(
+		'BeforeViewProductListDisplay',
+		array($this->products)
+	);
 	// Load Module
 	echo J2Store::modules()->loadposition('j2store-product-list-top');
 
@@ -63,7 +75,10 @@ $filter_position = $this->params->get('list_filter_position', 'right');
 		<!-- Page Header -->
 		<div class="page-header">
 			<!-- Main H1 -->
-			<h1> <?= $this->escape($this->params->get('page_heading')); ?> </h1>
+			<h1>
+				<!-- Text -->
+				<?= $this->escape($this->params->get('page_heading')); ?>
+			</h1>
 		</div>
 	<?php endif; ?>
 
@@ -75,8 +90,10 @@ $filter_position = $this->params->get('list_filter_position', 'right');
 			// If filtering is positioned on the left:
 			if ($filter_position == 'left'): ?>
 				<!-- Load Filter div -->
-				<div class="j2store-sidebar-filters-container col-sm-3">
+				<div
+					class="j2store-sidebar-filters-container col-sm-3">
 					<?php
+
 					// Load Top Modules
 					echo J2Store::modules()->loadposition('j2store-filter-left-top');
 
@@ -130,7 +147,9 @@ $filter_position = $this->params->get('list_filter_position', 'right');
 						<?php endif; ?>
 
 						<!-- Create Dynamic Grid Layout -->
-						<div class="col-sm-<?= round((12 / $col)); ?>">
+						<div
+							class="col-xl-<?= round(12 / max(1, $col)); ?> col-lg-<?= round(12 / max(1, min($col, 4))); ?> col-md-<?= round(12 / max(1, min($col, 2))); ?> col-12">
+
 							<!-- Assign unique product classes -->
 							<!-- 
 							// TODO: ADD CARD LAYOUT
@@ -257,7 +276,8 @@ $filter_position = $this->params->get('list_filter_position', 'right');
 			// Check if position is set top right
 			if ($filter_position == 'right'): ?>
 				<!-- Generate a sidebar for right site filter -->
-				<div class="j2store-sidebar-filters-container col-sm-3">
+				<div
+					class="j2store-sidebar-filters-container col-sm-3">
 					<?php
 					// Load Top Modules
 					echo J2Store::modules()->loadposition('j2store-filter-right-top');

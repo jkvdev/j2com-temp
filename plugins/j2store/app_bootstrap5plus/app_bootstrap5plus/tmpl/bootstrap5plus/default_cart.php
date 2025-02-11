@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -17,7 +17,9 @@ defined('_JEXEC') or die;
 // Check if the product has a custom "Add to Cart" button text
 if (!empty($this->product->addtocart_text)) {
 	// Use custom text
-	$cart_text = Text::_($this->product->addtocart_text);
+	$cart_text = Text::_(
+		$this->product->addtocart_text
+	);
 } else {
 	// Use default text
 	$cart_text = Text::_('J2STORE_ADD_TO_CART');
@@ -28,7 +30,13 @@ if (!empty($this->product->addtocart_text)) {
 $show = J2Store::product()->validateVariableProduct($this->product);
 
 // Event Hook: allows plugins to inject content before the Add to Cart Button
-echo J2Store::plugin()->eventWithHtml('BeforeAddToCartButton', array($this->product, J2Store::utilities()->getContext('default_cart')));
+echo J2Store::plugin()->eventWithHtml(
+	'BeforeAddToCartButton',
+	array(
+		$this->product,
+		J2Store::utilities()->getContext('default_cart')
+	)
+);
 
 // Display the add to cart section
 // If the product has variables show:

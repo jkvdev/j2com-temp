@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -11,10 +11,9 @@ use Joomla\CMS\Router\Route;
 
 // No direct access
 defined('_JEXEC') or die;
-?>
 
-<!-- Check if the product title should be showed -->
-<?php if ($this->params->get('list_show_title', 1)): ?>
+// Check if the product title should be showed 
+if ($this->params->get('list_show_title', 1)): ?>
 	<!-- The product title is displayed as a H2 -->
 	<h2 class="product-title">
 		<!-- If title is Clickable / Link: -->
@@ -28,13 +27,13 @@ defined('_JEXEC') or die;
 							); ?>"
 				title="<?= $this->escape($this->product->product_name); ?>"
 				class="text-primary text-decoration-none h2">
-			<?php endif; ?>
+			<?php endif;
 
-			<!-- Display the product name -->
-			<?= $this->product->product_name; ?>
+		// Display the product name
+		echo $this->product->product_name;
 
-			<!-- If title is a Link -->
-			<?php if ($this->params->get('list_link_title', 1)): ?>
+		// If title is a Link
+		if ($this->params->get('list_link_title', 1)): ?>
 				<!-- End Link -->
 			</a>
 		<?php endif; ?>
