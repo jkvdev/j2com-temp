@@ -49,3 +49,11 @@ img {
     margin-right: auto;
   }
 }
+
+/* Change the color of the active link */
+.nav-item.active .nav-link,
+.nav-item.active .nav-link:hover {
+  color: $primary !important; /* Make sure this is the color you want */
+  // font-weight: bold !important;
+  /* Ensure boldness */
+}

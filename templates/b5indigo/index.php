@@ -135,17 +135,31 @@ $this->setMetaData('viewport', 'width=device-width, initial-scale=1');
       </header>
 
       <!-- Navbar -->
+      <!-- Off canvas navbar -->
       <nav class="navbar navbar-expand-lg fw-medium text-primary">
 
         <?php // Update 1.14 - Added support for mobile menu with bootstrap 
         ?>
         <!-- Burger Menu -->
-        <button
+        <!-- <button
           class="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#mainmenu"
           aria-controls="mainmenu"
+          aria-expanded="false"
+          aria-label="Toggle navigation"> -->
+        <!-- Menu Icon -->
+        <!-- <span class="navbar-toggler-icon"></span>
+        </button> -->
+
+        <!-- New Burger Menu -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#offCanvasMenu"
+          aria-controls="offCanvasMenu"
           aria-expanded="false"
           aria-label="Toggle navigation">
 
@@ -156,13 +170,52 @@ $this->setMetaData('viewport', 'width=device-width, initial-scale=1');
         <?php // Put menu links in the navbar - main menu must be in the "menu" position!!! Only supports top level and 1 down, so no more than 1 level of child items 
 
         // If any module is assigned the menu position
-        if ($this->countModules('menu')): ?>
-          <div
+        //if ($this->countModules('menu')): 
+        ?>
+        <!-- <div
             class="collapse navbar-collapse"
             id="mainmenu">
             <jdoc:include type="modules" name="menu" style="none" />
+          </div> -->
+        <?php // endif; 
+        ?>
+
+        <!-- Off-Canvas Menu -->
+        <div
+          class="offcanvas offcanvas-end p-4 p-lg-0"
+          data-bs-scroll="true"
+          tabindex="-1" id="offCanvasMenu"
+          aria-labelledby="offCanvasMenuLabel">
+          <!-- Header -->
+          <div class="offcanvas-header">
+            <!-- Logo -->
+            <h5
+              class="offcanvas-title"
+              id="offCanvasMenuLabel">
+              <!-- Site Name -->
+              <?= ($sitename); ?>
+            </h5>
+
+            <!-- Close button -->
+            <button
+              type="button"
+              class="btn-close text-reset"
+              data-bs-dismiss="offcanvas"
+              aria-label="Close">
+            </button>
           </div>
-        <?php endif; ?>
+
+          <!-- Main Body -->
+          <div class="offcanvas-body">
+            <?php
+
+            // If content is rendered in the menu position
+            if ($this->countModules('menu')): ?>
+              <!-- Render Menu -->
+              <jdoc:include type="modules" name="menu" style="none" />
+            <?php endif; ?>
+          </div>
+        </div>
 
       </nav>
     </div>
