@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -74,6 +74,7 @@ if ($options): ?>
 
               // If option is checked by default, set to checked
               if ($option_value['product_optionvalue_default']) $checked = 'selected="selected"'; ?>
+              
               <!-- Default option -->
               <option
                 <?= $checked; ?>
