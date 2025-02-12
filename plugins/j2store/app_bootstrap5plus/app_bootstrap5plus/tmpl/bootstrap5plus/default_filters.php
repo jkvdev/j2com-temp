@@ -59,7 +59,10 @@ $catid = Factory::getApplication()->input->get(
 $default_catid = '';
 
 // Check if there are any category filters available 
-if (!empty($this->filters['filter_categories']) && count($this->filters['filter_categories'])) {
+if (
+	!empty($this->filters['filter_categories'])
+	&& count($this->filters['filter_categories'])
+) {
 	// If categories exist, set the default to the first one
 	$default_catid = $this->filters['filter_categories'][0]->id;
 }
@@ -175,9 +178,8 @@ $filter_catid = isset($this->filter_catid) ? $this->filter_catid : '';
 						<!-- Price -->
 						<?= $d_priceto; ?>
 					</span>
-					<?php if ($currency_position == 'post') echo $currency; ?>
+					<?php if ($currency_position == 'post') echo $currency;
 
-					<?php
 					// Generate Hidden Fields
 					echo J2Html::hidden(
 						'pricefrom',
@@ -344,10 +346,9 @@ $filter_catid = isset($this->filter_catid) ? $this->filter_catid : '';
 							</div>
 						</div>
 					<?php endif; ?>
-				<?php endif; ?>
+					<?php endif;
 
-				<!-- Manufacturer -->
-				<?php
+				// Manufacturer 
 				// Check if manufacturer filter is enabled
 				if ($this->params->get('list_show_manfacturer_filter', 0)):
 					// Check if manufacturers are available
@@ -361,13 +362,16 @@ $filter_catid = isset($this->filter_catid) ? $this->filter_catid : '';
 									<!-- Text -->
 									<?= Text::_('J2STORE_PRODUCT_FILTER_BY_BRAND'); ?>
 								</h4>
+
 								<!-- Manufacturer filters -->
 								<span>
 									<?php
 									// If manufacturer filters are displayed: 
 									if (!empty($session_manufacturer_ids)): ?>
 										<!-- Clear Link -->
-										<a href="javascript:void(0);" onclick="resetJ2storeBrandFilter();">
+										<a
+											href="javascript:void(0);"
+											onclick="resetJ2storeBrandFilter();">
 											<!-- Text -->
 											<?= Text::_('J2STORE_CLEAR'); ?>
 										</a>
@@ -385,6 +389,7 @@ $filter_catid = isset($this->filter_catid) ? $this->filter_catid : '';
 								foreach ($this->filters['manufacturers'] as $k => $brand):
 									// Initialize checked as empty
 									$checked = '';
+
 									// Check if manufacturer id is selected in the session
 									if (
 										!empty($session_manufacturer_ids)
@@ -439,7 +444,9 @@ $filter_catid = isset($this->filter_catid) ? $this->filter_catid : '';
 							// If any vendor filters are applied
 							if (!empty($session_vendor_ids)): ?>
 								<!-- Clear Link -->
-								<a href="javascript:void(0);" onclick="resetJ2storeVendorFilter();">
+								<a
+									href="javascript:void(0);"
+									onclick="resetJ2storeVendorFilter();">
 									<!-- Text -->
 									<?= Text::_('J2STORE_CLEAR'); ?>
 								</a>
@@ -476,11 +483,11 @@ $filter_catid = isset($this->filter_catid) ? $this->filter_catid : '';
 										name="vendor_ids[]"
 										<?= $checked; ?>
 										value="<?= $vendor->j2store_vendor_id; ?>" />
-									<!--
-										onclick="document.getElementById('j2store-product-loading').style.display='block';document.getElementById('productsideFilters').submit()"
-										onchange="jQuery('#j2store-product-loading').show();this.form.submit()" -->
 
 									<?php
+									// onclick="document.getElementById('j2store-product-loading').style.display='block';document.getElementById('productsideFilters').submit()"
+									// onchange="jQuery('#j2store-product-loading').show();this.form.submit()"
+
 									// Display vendor name
 									echo $this->escape($vendor->first_name . ' ' . $vendor->last_name); ?>
 								</label>
@@ -506,6 +513,7 @@ $filter_catid = isset($this->filter_catid) ? $this->filter_catid : '';
 							$filter_script_id = J2Store::utilities()->generateId(
 								$filtergroup['group_name']
 							) . '_' . $pf_key; ?>
+
 							<!-- Main Filter Group DIV -->
 							<div class="product-filter-group <?= $filter_script_id; ?>">
 								<!-- Filter Group Header -->
@@ -543,7 +551,6 @@ $filter_catid = isset($this->filter_catid) ? $this->filter_catid : '';
 											<!-- Plus Icon -->
 											<i class="icon-plus"></i>
 										</span>
-
 									<?php
 
 									// If filter is expandable
@@ -569,7 +576,6 @@ $filter_catid = isset($this->filter_catid) ? $this->filter_catid : '';
 											<!-- Minus Icon -->
 											<i class="icon-minus"></i>
 										</span>
-
 									<?php endif;
 
 									// If there are any filters, generate clear filters button
@@ -588,7 +594,6 @@ $filter_catid = isset($this->filter_catid) ? $this->filter_catid : '';
 									<?php endif; ?>
 								</span>
 							</div>
-
 							<?php
 
 							// Product filter group visibility
@@ -637,7 +642,8 @@ $filter_catid = isset($this->filter_catid) ? $this->filter_catid : '';
 										}
 										?>
 											<!-- Filter Label -->
-											<label class="j2store-productfilter-label">
+											<label
+												class="j2store-productfilter-label">
 
 												<!-- Checkbox Input -->
 												<input
@@ -752,11 +758,13 @@ if (
 
 			// Format Thousands
 			var replace_string = "$1<?= $thousand; ?>";
-			format_amount = format_amount.replace(/(\d)(?=(\d{3})+\.)/g, replace_string).toString();
-			format_amount = format_amount.substring(0, format_amount.length);
+			format_amount = format_amount
+				.replace(/(\d)(?=(\d{3})+\.)/g, replace_string)
+				.toString();
+			format_amount = format_amount
+				.substring(0, format_amount.length);
 
 			//format_amount = format_amount.toFloat();
-
 			return format_amount;
 		}
 
@@ -795,6 +803,7 @@ if (
 					// Converts newly selected prices based on currency rate
 					var min_format = ui.values[0] * format_value;
 					var max_format = ui.values[1] * format_value;
+
 					// Format display values
 					$("#min_price_display").html(formatCurrency(min_format));
 					$("#max_price_display").html(formatCurrency(max_format));
