@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  *
  * Bootstrap 2 layout of product detail
@@ -96,7 +96,7 @@ $platform = J2Store::platform();
 			} ?>
 				<!-- Main Product DIV -->
 				<div
-					class="col-sm-<?= round((12 / $columns)); ?> upsell-product product-<?= $cross_sell_product->j2store_product_id; ?> <?= isset($cross_sell_css) ? $cross_sell_css : ''; ?>  ">
+					class="col-sm-<?= round((12 / $columns)); ?> crosssell-product product-<?= $cross_sell_product->j2store_product_id; ?> <?= isset($cross_sell_css) ? $cross_sell_css : ''; ?>  ">
 
 					<!-- Product Image -->
 					<span class="cross-sell-product-image">
@@ -130,7 +130,6 @@ $platform = J2Store::platform();
 									width="<?= intval($cross_image_width); ?>" />
 							</a>
 						<?php endif; ?>
-
 					</span>
 
 					<!-- Product Title -->

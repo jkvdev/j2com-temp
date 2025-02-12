@@ -113,7 +113,14 @@ if ($this->params->get('list_show_image', 1)):
           elseif (!empty($this->product->main_image)):
 
             // Display main image
-            echo J2Store::product()->displayImage($this->product, array('type' => 'Main', 'params' => $this->params, 'alt' => $this->escape($this->product->main_image_alt)));
+            echo J2Store::product()->displayImage(
+              $this->product,
+              array(
+                'type' => 'Main',
+                'params' => $this->params,
+                'alt' => $this->escape($this->product->main_image_alt)
+              )
+            );
 
           endif; ?>
       </div>

@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -35,7 +35,7 @@ if (
   $this->params->get('item_show_product_main_image', 1)
   && !empty($this->product->main_image)
 ): ?>
-  <!-- Main IMage DIV -->
+  <!-- Main Image DIV -->
   <div class="j2store-mainimage">
     <?php
 

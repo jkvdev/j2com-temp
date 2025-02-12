@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  *
  * Bootstrap 2 layout of products
@@ -87,7 +87,6 @@ $currency = $this->currency->getSymbol(); ?>
 					<i class="fas fa-refresh"></i> <!-- Reset Icon -->
 				</button>
 			</div>
-
 		<?php endif;
 
 		// Sorting
