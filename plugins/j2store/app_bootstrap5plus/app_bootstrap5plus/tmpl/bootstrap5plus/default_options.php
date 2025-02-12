@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -25,7 +25,6 @@ $product_helper = J2Store::product();
 // Set AJAX URL
 $ajax_url = Route::_('index.php', false);
 
-// TODO: GET RID OF CURLY BRACES
 // Checking if the product has options
 if ($options): ?>
 
@@ -78,7 +77,9 @@ if ($options): ?>
 							$checked = '';
 
 							// Check if the option is default
-							if ($option_value['product_optionvalue_default']) $checked = 'selected="selected"'; ?>
+							if (
+								$option_value['product_optionvalue_default']
+							) $checked = 'selected="selected"'; ?>
 
 							<!-- Dropdown menu option -->
 							<option
@@ -148,7 +149,9 @@ if ($options): ?>
 						$checked = '';
 
 						// check if its default
-						if ($option_value['product_optionvalue_default']) $checked = 'checked="checked"'; ?>
+						if (
+							$option_value['product_optionvalue_default']
+						) $checked = 'checked="checked"'; ?>
 						<!-- Input radio button -->
 						<input
 							<?= $checked; ?>
@@ -163,7 +166,6 @@ if ($options): ?>
           						);" />
 
 						<?php
-
 						// Display an Option Image if enabled
 						if (
 							$this->params->get('image_for_product_options', 0) &&
@@ -299,7 +301,7 @@ if ($options): ?>
 						// Get product option id
 						var po_id = '<?= $option['productoption_id']; ?>';
 
-						// Set even listener for the checkbox
+						// Set event listener for the checkbox
 						$('#option-' + po_id + ' input:checkbox')
 							.bind("click", function() {
 								// Get Product id
@@ -495,7 +497,10 @@ if ($options): ?>
 				<?php
 
 				// Adding datetime picker via JavaScript
-				J2StoreStrapper::addDateTimePicker($element_datetime, $option['option_params']); ?>
+				J2StoreStrapper::addDateTimePicker(
+					$element_datetime,
+					$option['option_params']
+				); ?>
 			<?php endif;
 
 			// Check if the option is a time
@@ -559,11 +564,14 @@ if (isset($options) && !empty($options)):
 							$('#form-upload').remove();
 
 							// Create hidden input field
-							$('body').prepend( /*html*/ `<form 
-								enctype="multipart/form-data" id="form-upload" style="display: none;">
+							$('body').prepend( /*html*/ `
+								<form 
+									enctype="multipart/form-data" 
+									id="form-upload" 
+									style="display: none;">
 									<input 
-										type="file" 
-										name="file" />
+											type="file" 
+											name="file" />
 								</form>`);
 
 							// Trigger file selection dialogue
@@ -637,6 +645,6 @@ if (isset($options) && !empty($options)):
 						});
 				})(j2store.jQuery);
 			</script>
-		<?php endif; ?>
-	<?php endforeach; ?>
-<?php endif; ?>
+<?php endif;
+	endforeach;
+endif; ?>

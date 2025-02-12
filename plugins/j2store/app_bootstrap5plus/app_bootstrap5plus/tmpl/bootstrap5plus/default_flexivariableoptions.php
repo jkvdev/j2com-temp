@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -61,7 +61,6 @@ if ($options): ?>
         }
       }
 
-
       // Set default option name to empty
       $default_option_value_name = '';
       // Set option count to 0
@@ -116,7 +115,9 @@ if ($options): ?>
               $checked = '';
 
               // Check if it is a default value and set it
-              if ($default_option_value_id == $option_value->j2store_optionvalue_id) $checked = 'selected="selected"'; ?>
+              if (
+                $default_option_value_id == $option_value->j2store_optionvalue_id
+              ) $checked = 'selected="selected"'; ?>
 
               <!-- Render option -->
               <option
@@ -160,7 +161,9 @@ if ($options): ?>
             $checked = '';
 
             // Check if it is set by default
-            if ($default_option_value_id == $option_value->j2store_optionvalue_id) $checked = 'checked="checked"'; ?>
+            if (
+              $default_option_value_id == $option_value->j2store_optionvalue_id
+            ) $checked = 'checked="checked"'; ?>
 
             <!-- Radio button -->
             <input
@@ -172,7 +175,8 @@ if ($options): ?>
                   <?= $this->product->j2store_product_id ?>,
                   '#option-<?= $option["productoption_id"]; ?>'
                 );"
-              value="<?= $option_value->j2store_optionvalue_id; ?>" id="option-value-<?= $option_value->j2store_optionvalue_id; ?>"
+              value="<?= $option_value->j2store_optionvalue_id; ?>"
+              id="option-value-<?= $option_value->j2store_optionvalue_id; ?>"
               data-product_id="<?= $this->product->j2store_product_id ?>" />
             <?php
 

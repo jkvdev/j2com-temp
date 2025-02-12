@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -112,14 +112,17 @@ if ($options): ?>
             </option>
 
             <?php
-            // 
+            // Loop over all option values
             foreach ($option['option_value'] as $option_value):
 
               // Set checked state to empty
               $checked = '';
 
               // If set by default, set checked
-              if ($default_option_value_id == $option_value->j2store_optionvalue_id) $checked = 'selected="selected"'; ?>
+              if (
+                $default_option_value_id == $option_value->j2store_optionvalue_id
+              ) $checked = 'selected="selected"'; ?>
+              
               <!-- Render option -->
               <option
                 <?= $checked; ?>

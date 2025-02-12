@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -82,7 +82,9 @@ if ($options): ?>
               $checked = '';
 
               // If set by default, set checked state
-              if ($option_value['product_optionvalue_default']) $checked = 'selected="selected"'; ?>
+              if (
+                $option_value['product_optionvalue_default']
+              ) $checked = 'selected="selected"'; ?>
 
               <!-- Render option -->
               <option
@@ -155,7 +157,9 @@ if ($options): ?>
             $checked = '';
 
             // If checked by default, set checked
-            if ($option_value['product_optionvalue_default']) $checked = 'checked="checked"'; ?>
+            if (
+              $option_value['product_optionvalue_default']
+            ) $checked = 'checked="checked"'; ?>
             <!-- Radio Input -->
             <input
               <?= $checked; ?>
@@ -599,6 +603,7 @@ if (isset($options) && !empty($options)):
 
               // Monitor file selection
               timer = setInterval(function() {
+                // If file has been selected
                 if (
                   $('#form-upload input[name=\'file\']').val() != '' &&
                   $('#form-upload input[name=\'file\']').val() !=

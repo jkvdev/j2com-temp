@@ -1,68 +1,125 @@
 <?php
+
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
+// Import Joomla packages
+use Joomla\CMS\Language\Text;
+
 // No direct access
 defined('_JEXEC') or die;
-?>
 
-<?php $images = $this->loadTemplate('images');
-J2Store::plugin()->event('BeforeDisplayImages', array(&$images, $this, 'com_j2store.products.list.bootstrap'));
+// Load Images template
+$images = $this->loadTemplate('images');
+
+// Run plugins before displaying images
+J2Store::plugin()->event(
+	'BeforeDisplayImages',
+	array(
+		&$images,
+		$this,
+		'com_j2store.products.list.bootstrap'
+	)
+);
+
+// Render images template
 echo $images;
-?>
-<?php echo $this->loadTemplate('title'); ?>
-<?php if(isset($this->product->event->afterDisplayTitle)) : ?>
-		<?php echo $this->product->event->afterDisplayTitle; ?>
-<?php endif;?>
 
+// Render title template
+echo $this->loadTemplate('title');
 
-<?php if(isset($this->product->event->beforeDisplayContent)) : ?>
-	<?php echo $this->product->event->beforeDisplayContent; ?>
-<?php endif;?>
+// If after title plugins are available
+if (isset($this->product->event->afterDisplayTitle)) {
+	// Render plugins
+	echo $this->product->event->afterDisplayTitle;
+}
 
-<?php echo $this->loadTemplate('description'); ?>
+// If before content plugins are available
+if (isset($this->product->event->beforeDisplayContent)) {
+	// Run plugins
+	echo $this->product->event->beforeDisplayContent;
+}
 
-<?php if( J2Store::product()->canShowprice($this->params) ): ?>
-<?php echo $this->loadTemplate('price'); ?>
-<?php endif; ?>
+//  Render description template
+echo $this->loadTemplate('description');
 
-<?php if($this->params->get('list_show_product_sku', 1) && J2Store::product()->canShowSku($this->params)) : ?>
-	<?php echo $this->loadTemplate('sku'); ?>
-<?php endif; ?>
+// If price is enabled
+if (J2Store::product()->canShowprice($this->params)) {
+	// Render price template
+	echo $this->loadTemplate('price');
+}
 
-<?php if($this->params->get('list_show_product_stock', 1)) : ?>
-	<?php echo $this->loadTemplate('stock'); ?>
-<?php endif; ?>
+// If SKU is enabled
+if (
+	$this->params->get('list_show_product_sku', 1)
+	&&  J2Store::product()->canShowSku($this->params)
+) {
+	// Render SKU template
+	echo $this->loadTemplate('sku');
+}
 
-<?php if( J2Store::product()->canShowCart($this->params) ): ?>
+// If product stock is enabled
+if ($this->params->get('list_show_product_stock', 1)) {
+	// Render stock template
+	echo $this->loadTemplate('stock');
+}
 
-<form action="<?php echo $this->product->cart_form_action; ?>"
-		method="post" class="j2store-addtocart-form"
-		id="j2store-addtocart-form-<?php echo $this->product->j2store_product_id; ?>"
-		name="j2store-addtocart-form-<?php echo $this->product->j2store_product_id; ?>"
-		data-product_id="<?php echo $this->product->j2store_product_id; ?>"
-		data-product_type="<?php echo $this->product->product_type; ?>"
-		<?php if(isset($this->product->variant_json)): ?>
-		data-product_variants="<?php echo $this->escape($this->product->variant_json);?>"
+// If price is enabled
+if (J2Store::product()->canShowCart($this->params)): ?>
+	<!-- Add to cart form -->
+	<form
+		method="post"
+		action="<?= $this->product->cart_form_action; ?>"
+		id="j2store-addtocart-form-<?= $this->product->j2store_product_id; ?>"
+		class="j2store-addtocart-form"
+		name="j2store-addtocart-form-<?= $this->product->j2store_product_id; ?>"
+		data-product_id="<?= $this->product->j2store_product_id; ?>"
+		data-product_type="<?= $this->product->product_type; ?>"
+		<?php
+		// If product has variants
+		// Pass them
+		if (isset($this->product->variant_json)): ?>
+		data-product_variants="<?= $this->escape($this->product->variant_json); ?>"
 		<?php endif; ?>
 		enctype="multipart/form-data">
 
-<?php $cart_type = $this->params->get('list_show_cart', 1); ?>
+		<?php
+		// Get cart type
+		$cart_type = $this->params->get('list_show_cart', 1);
 
-<?php if($cart_type == 1) : ?>
-	<?php echo $this->loadTemplate('variableoptions'); ?>
-	<?php echo $this->loadTemplate('cart'); ?>
+		// If cart is of type 1 / Standard
+		if ($cart_type == 1) :
+			// Load variable options
+			echo $this->loadTemplate('variableoptions');
+			// Render cart
+			echo $this->loadTemplate('cart'); ?>
 
-<?php else:?>
-<!-- we have options so we just redirect -->
-	<a href="<?php echo $this->product->product_link; ?>" class="<?php echo $this->params->get('choosebtn_class', 'btn btn-success'); ?>"><?php echo JText::_('J2STORE_VIEW_PRODUCT_DETAILS'); ?></a>
-<?php endif; ?>
-<input type="hidden" name="variant_id" value="<?php echo $this->product->variant->j2store_variant_id; ?>" />
-</form>
-<?php endif; ?>
-<?php if(isset($this->product->event->afterDisplayContent)) : ?>
-	<?php echo $this->product->event->afterDisplayContent; ?>
-<?php endif;?>
+		<?php else: ?>
+			<!-- Redirect to product details page -->
+			<a
+				href="<?= $this->product->product_link; ?>"
+				class="<?= $this->params->get(
+									'choosebtn_class',
+									'btn btn-success'
+								); ?>">
+				<!-- Link text -->
+				<?= Text::_('J2STORE_VIEW_PRODUCT_DETAILS'); ?>
+			</a>
+		<?php endif; ?>
+
+		<!-- Hidden input for variant ID -->
+		<input
+			type="hidden"
+			name="variant_id"
+			value="<?= $this->product->variant->j2store_variant_id; ?>" />
+	</form>
+<?php endif;
+
+// Event Hook: for after display content
+if (isset($this->product->event->afterDisplayContent)) {
+	// Run plugins
+	echo $this->product->event->afterDisplayContent;
+} ?>

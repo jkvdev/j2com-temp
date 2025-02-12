@@ -1,306 +1,678 @@
 <?php
+
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
+// Import Joomla packages
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
+
 // No direct access
 defined('_JEXEC') or die;
+
+// Get J2STORE Platform 
 $platform = J2Store::platform();
+// Get List of product options
 $options = $this->product->options;
+// Get Product ID
 $product_id = $this->product->j2store_product_id;
-?>
-<?php if ($options) { ?>
 
-      <div class="options">
-        <?php foreach ($options as $option) { ?>
-        
-        <?php echo J2Store::plugin()->eventWithHtml('BeforeDisplaySingleProductOption', array($this->product, &$option)); ?>
-        
-        <?php //var_dump($option); ?>
-        <?php if ($option['type'] == 'select' && isset($option['optionvalue']) && !empty($option['optionvalue'])) { ?>
-        <!-- select -->
-        <div id="option-<?php echo $option['productoption_id']; ?>" class="option">
-          <?php if ($option['required']) { ?>
-          <span class="required">*</span>
-          <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
-          <select name="product_option[<?php echo $option['productoption_id']; ?>]"
-          	onChange="doAjaxFilter(
+// Check if there are any product options
+if ($options): ?>
+  <!-- Main Options DIV -->
+  <div class="options">
+    <?php
+
+    // Loop through all the options
+    foreach ($options as $option):
+
+      // Trigger plugin events before displaying options
+      echo J2Store::plugin()->eventWithHtml(
+        'BeforeDisplaySingleProductOption',
+        array(
+          $this->product,
+          &$option
+        )
+      );
+
+      // Check if option is a select dropdown
+      if (
+        $option['type'] == 'select'
+        && isset($option['optionvalue'])
+        && !empty($option['optionvalue'])
+      ): ?>
+        <!-- Main Select Dropdown DIV -->
+        <div
+          id="option-<?= $option['productoption_id']; ?>"
+          class="option">
+          <?php
+          // If Option is required
+          if ($option['required']): ?>
+            <!-- Required span -->
+            <span class="required">*</span>
+          <?php endif; ?>
+
+          <!-- Option Text in bold -->
+          <b><?= $this->escape(Text::_($option['option_name'])); ?>:</b>
+
+          <!-- Break -->
+          <br>
+
+          <!-- Dropdown menu -->
+          <select
+            name="product_option[<?= $option['productoption_id']; ?>]"
+            onChange="doAjaxFilter(
           						this.options[this.selectedIndex].value,
-          						<?php echo $product_id?>,
-          						<?php echo $option["productoption_id"]; ?>,
-          						'#option-<?php echo $option["productoption_id"]; ?>'
-          						);"
-          >
-            <option value=""><?php echo JText::_('J2STORE_ADDTOCART_SELECT'); ?></option>
-            <?php foreach ($option['optionvalue'] as $option_value) { ?>
-            	<?php $checked = ''; if($option_value['product_optionvalue_default']) $checked = 'selected="selected"'; ?>
-
-            <option <?php echo $checked; ?> value="<?php echo $option_value['product_optionvalue_id']; ?>"><?php echo stripslashes($this->escape(JText::_($option_value['optionvalue_name']))); ?>
-            <?php if ($option_value['product_optionvalue_price'] > 0 && $this->params->get('product_option_price', 1)) { ?>
-            (
-            <?php if($this->params->get('product_option_price_prefix', 1)): ?>
-            	<?php echo $option_value['product_optionvalue_prefix']; ?>
-            <?php endif; ?>
-            <?php  echo J2Store::product()->displayPrice($option_value['product_optionvalue_price'], $this->product, $this->params,'products.list.option'); ?>
-            )
-            <?php } ?>
+          						<?= $product_id ?>,
+          						<?= $option["productoption_id"]; ?>,
+          						'#option-<?= $option["productoption_id"]; ?>'
+          						);">
+            <!-- Default Option -->
+            <option value="">
+              <?= Text::_('J2STORE_ADDTOCART_SELECT'); ?>
             </option>
-            <?php } ?>
+
+            <?php
+            // For all the option values:
+            foreach ($option['optionvalue'] as $option_value):
+              // Set checked state to empty
+              $checked = '';
+
+              // If the option has a default value it is pre selected
+              if (
+                $option_value['product_optionvalue_default']
+              ) $checked = 'selected="selected"'; ?>
+
+              <!-- Render dropdown option -->
+              <option
+                <?= $checked; ?>
+                value="<?= $option_value['product_optionvalue_id']; ?>">
+
+                <?php
+                // Render option text
+                echo stripslashes($this->escape(
+                  Text::_(
+                    $option_value['optionvalue_name']
+                  )
+                ));
+
+                // Check if there are additional price adjustments 
+                if (
+                  $option_value['product_optionvalue_price'] > 0
+                  && $this->params->get('product_option_price', 1)
+                ): ?>
+                  (
+                  <?php
+
+                  // Check if there is a price prefix
+                  if ($this->params->get('product_option_price_prefix', 1)) {
+                    // Render prefix
+                    echo $option_value['product_optionvalue_prefix'];
+                  }
+
+                  // Render extra price
+                  echo J2Store::product()->displayPrice(
+                    $option_value['product_optionvalue_price'],
+                    $this->product,
+                    $this->params,
+                    'products.list.option'
+                  ); ?>
+                  )
+                <?php endif; ?>
+              </option>
+            <?php endforeach; ?>
           </select>
         </div>
         <br>
-        <?php } ?>
+      <?php endif;
 
-        <?php if ($option['type'] == 'radio' && isset($option['optionvalue']) && !empty($option['optionvalue'])) { ?>
-          <!-- radio -->
-        <div id="option-<?php echo $option['productoption_id']; ?>" class="option">
-          <?php if ($option['required']) { ?>
-          <span class="required">*</span>
-          <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
-          <?php foreach ($option['optionvalue'] as $option_value) { ?>
-          	<?php $checked = ''; if($option_value['product_optionvalue_default']) $checked = 'checked="checked"'; ?>
-          <input <?php echo $checked; ?> type="radio" name="product_option[<?php echo $option['productoption_id']; ?>]" value="<?php echo $option_value['product_optionvalue_id']; ?>" id="option-value-<?php echo $option_value['product_optionvalue_id']; ?>"
-          onChange="doAjaxFilter(
-          						this.value,
-          						<?php echo $product_id?>,
-          						<?php echo $option["productoption_id"]; ?>,
-          						'#option-<?php echo $option["productoption_id"]; ?>'
-          						);"
+      // Check if option is a radio button
+      if (
+        $option['type'] == 'radio'
+        && isset($option['optionvalue'])
+        && !empty($option['optionvalue'])
+      ): ?>
+        <!-- Main Radio Option DIV -->
+        <div
+          id="option-<?= $option['productoption_id']; ?>"
+          class="option">
+          <?php
 
-          />
-
-          <?php if(
-          			$this->params->get('image_for_product_options', 0) &&
-          			  isset($option_value['optionvalue_image']) &&
-          			!empty($option_value['optionvalue_image'])
-				):
-          ?>
-				<img class="optionvalue-image-<?php echo $option_value['product_optionvalue_id']; ?>" src="<?php echo JUri::root(true).'/'.$option_value['optionvalue_image']; ?>" />
+          // If option is required
+          if ($option['required']): ?>
+            <!-- Required span -->
+            <span class="required">*</span>
           <?php endif; ?>
-          <label for="option-value-<?php echo $option_value['product_optionvalue_id']; ?>"><?php echo stripslashes($this->escape(JText::_($option_value['optionvalue_name']))); ?>
-            <?php if ($option_value['product_optionvalue_price'] > 0 && $this->params->get('product_option_price', 1)) { ?>
-	         	(
-	         	 <?php if($this->params->get('product_option_price_prefix', 1)): ?>
-            		<?php echo $option_value['product_optionvalue_prefix']; ?>
-            	<?php endif; ?>
-            	<?php  echo J2Store::product()->displayPrice($option_value['product_optionvalue_price'], $this->product, $this->params,'products.list.option'); ?>
-            	)
 
-            <?php } ?>
-          </label>
+          <!-- Option text in bold -->
+          <b><?= $this->escape(Text::_($option['option_name'])); ?>:</b>
+
+          <!-- Break -->
           <br>
-          <?php } ?>
-        </div>
-        <br>
-        <?php } ?>
 
-        <?php if ($option['type'] == 'checkbox' && isset($option['optionvalue']) && !empty($option['optionvalue'])) { ?>
-          <!-- checkbox-->
+          <?php
 
-        <div id="option-<?php echo $option['productoption_id']; ?>" class="option">
-          <?php if ($option['required']) { ?>
-          <span class="required">*</span>
-          <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
-          <?php foreach ($option['optionvalue'] as $option_value) { ?>
-          <input type="checkbox" name="product_option[<?php echo $option['productoption_id']; ?>][]" value="<?php echo $option_value['product_optionvalue_id']; ?>" id="option-value-<?php echo $option_value['product_optionvalue_id']; ?>" />
-              <?php if(
-                  $this->params->get('image_for_product_options', 0) &&
-                  isset($option_value['optionvalue_image']) &&
-                  !empty($option_value['optionvalue_image'])
-              ):
-                  ?>
-                  <img class="optionvalue-image-<?php echo $option_value['product_optionvalue_id']; ?>" src="<?php echo JUri::root(true).'/'.$option_value['optionvalue_image']; ?>" />
+          // Loop through each option value
+          foreach ($option['optionvalue'] as $option_value):
+            // Set is checked state to empty
+            $checked = '';
+
+            // Check if it is set by default
+            if (
+              $option_value['product_optionvalue_default']
+            ) $checked = 'checked="checked"'; ?>
+
+            <!-- Radio Button Input -->
+            <input
+              <?= $checked; ?>
+              type="radio"
+              name="product_option[<?= $option['productoption_id']; ?>]"
+              value="<?= $option_value['product_optionvalue_id']; ?>"
+              id="option-value-<?= $option_value['product_optionvalue_id']; ?>"
+              onChange="doAjaxFilter(
+          						this.value,
+          						<?= $product_id ?>,
+          						<?= $option["productoption_id"]; ?>,
+          						'#option-<?= $option["productoption_id"]; ?>'
+          						);" />
+            <?php
+
+            // Display image for each option if available
+            if (
+              $this->params->get('image_for_product_options', 0) &&
+              isset($option_value['optionvalue_image']) &&
+              !empty($option_value['optionvalue_image'])
+            ):
+            ?>
+              <!-- Option Image -->
+              <img
+                class="optionvalue-image-<?= $option_value['product_optionvalue_id']; ?>"
+                src="<?= Uri::root(true) . '/' . $option_value['optionvalue_image']; ?>" />
+            <?php endif; ?>
+
+            <!-- Option Label -->
+            <label
+              for="option-value-<?= $option_value['product_optionvalue_id']; ?>">
+              <!-- Label Text -->
+              <?= stripslashes($this->escape(Text::_($option_value['optionvalue_name']))); ?>
+              <?php
+
+              // Check if option has additional price
+              if (
+                $option_value['product_optionvalue_price'] > 0
+                && $this->params->get('product_option_price', 1)
+              ) : ?>
+                (
+                <?php
+
+                // If there is a prefix
+                if ($this->params->get('product_option_price_prefix', 1)) {
+                  // Render prefix
+                  echo $option_value['product_optionvalue_prefix'];
+                }
+
+                // Display extra price
+                echo J2Store::product()->displayPrice(
+                  $option_value['product_optionvalue_price'],
+                  $this->product,
+                  $this->params,
+                  'products.list.option'
+                ); ?>
+                )
               <?php endif; ?>
-              <label for="option-value-<?php echo $option_value['product_optionvalue_id']; ?>"><?php echo stripslashes($this->escape(JText::_($option_value['optionvalue_name']))); ?>
-            <?php if ($option_value['product_optionvalue_price'] > 0 && $this->params->get('product_option_price', 1)) { ?>
-               (
-               <?php if($this->params->get('product_option_price_prefix', 1)): ?>
-            		<?php echo $option_value['product_optionvalue_prefix']; ?>
-            	<?php endif; ?>
-            	<?php  echo J2Store::product()->displayPrice($option_value['product_optionvalue_price'], $this->product, $this->params,'products.list.option'); ?>
-            	)
-            	<?php } ?>
-          </label>
+            </label>
+            <br>
+          <?php endforeach; ?>
+        </div>
+        <br>
+      <?php endif;
+
+      // Check if option is a checkbox
+      if (
+        $option['type'] == 'checkbox'
+        && isset($option['optionvalue'])
+        && !empty($option['optionvalue'])
+      ) : ?>
+        <!-- Main Checkbox DIV -->
+        <div
+          id="option-<?= $option['productoption_id']; ?>"
+          class="option">
+          <?php
+
+          // If option is required
+          if ($option['required']): ?>
+            <!-- Required span -->
+            <span class="required">*</span>
+          <?php endif; ?>
+
+          <!-- Option text in bold -->
+          <b><?= $this->escape(Text::_($option['option_name'])); ?>:</b>
+
+          <!-- Break -->
           <br>
-          <?php } ?>
+
+          <?php
+
+          // Loop over all option values
+          foreach ($option['optionvalue'] as $option_value): ?>
+            <!-- Checkbox -->
+            <input
+              type="checkbox"
+              name="product_option[<?= $option['productoption_id']; ?>][]"
+              value="<?= $option_value['product_optionvalue_id']; ?>"
+              id="option-value-<?= $option_value['product_optionvalue_id']; ?>" />
+            <?php
+
+            // Display option image if available
+            if (
+              $this->params->get('image_for_product_options', 0) &&
+              isset($option_value['optionvalue_image']) &&
+              !empty($option_value['optionvalue_image'])
+            ):
+            ?>
+              <!-- Option Image -->
+              <img
+                class="optionvalue-image-<?= $option_value['product_optionvalue_id']; ?>"
+                src="<?= Uri::root(true) . '/' . $option_value['optionvalue_image']; ?>" />
+            <?php endif; ?>
+
+            <!-- Checkbox label -->
+            <label
+              for="option-value-<?= $option_value['product_optionvalue_id']; ?>">
+              <!-- Label Text -->
+              <?= stripslashes($this->escape(Text::_($option_value['optionvalue_name'])));
+
+              // Check if there is an additional price
+              if (
+                $option_value['product_optionvalue_price'] > 0
+                && $this->params->get('product_option_price', 1)
+              ): ?>
+                (
+                <?php
+
+                // If there is a prefix
+                if ($this->params->get('product_option_price_prefix', 1)) {
+                  // Render prefix
+                  echo $option_value['product_optionvalue_prefix'];
+                }
+
+                // Display additional price
+                echo J2Store::product()->displayPrice(
+                  $option_value['product_optionvalue_price'],
+                  $this->product,
+                  $this->params,
+                  'products.list.option'
+                ); ?>
+                )
+              <?php endif; ?>
+            </label>
+            <br>
+          <?php endforeach; ?>
         </div>
         <br>
 
-		<script type="text/javascript">
+        <script type="text/javascript">
+          // AJAX Filtering
+          (function($) {
+            // Get Product option ID
+            var po_id = '<?= $option['productoption_id']; ?>';
 
-			(function($) {
-				var po_id = '<?php echo $option['productoption_id']; ?>';
-				$('#option-'+po_id+' input:checkbox').bind("click",function(){
-                    var checkbox_value = $('#option-'+po_id+' input:checkbox:checked').val();
-				    var product_id = '<?php echo $product_id?>';
-				    doAjaxFilter(checkbox_value, product_id, po_id, '#option-'+po_id+' input:checkbox');
-				});
-			})(j2store.jQuery);
-		
-		</script>
+            // Bind click even on checkbox
+            $('#option-' + po_id + ' input:checkbox')
+              .bind("click", function() {
+                // Get the checkbox value
+                var checkbox_value = $('#option-' + po_id + ' input:checkbox:checked').val();
+                // Get the product ID
+                var product_id = '<?= $product_id ?>';
 
-        <?php } ?>
+                // Update product display price without refreshing
+                doAjaxFilter(
+                  checkbox_value,
+                  product_id, po_id,
+                  '#option-' + po_id + ' input:checkbox');
+              });
+          })(j2store.jQuery);
+        </script>
 
+      <?php endif;
 
-        <?php if ($option['type'] == 'text') { ?>
+      // Check if the option is a text field
+      if ($option['type'] == 'text'):
+        // Get option parameters
+        $text_option_params = $platform->getRegistry($option['option_params']);
+      ?>
+        <!-- Main Text Field DIV -->
+        <div
+          id="option-<?= $option['productoption_id']; ?>"
+          class="option">
+          <?php
+
+          // If field is required
+          if ($option['required']) : ?>
+            <!-- Required span -->
+            <span class="required">*</span>
+          <?php endif; ?>
+
+          <!-- Option Text in bold -->
+          <b><?= $this->escape(Text::_($option['option_name'])); ?>:</b>
+
+          <!-- Break -->
+          <br>
+
+          <!-- Textfield input -->
+          <input
+            type="text"
+            name="product_option[<?= $option['productoption_id']; ?>]"
+            value="<?= $option['optionvalue']; ?>"
+            placeholder="<?= $text_option_params->get('place_holder', ''); ?>" />
+        </div>
+        <br>
+      <?php endif;
+
+      // Check if the option is a textarea
+      if ($option['type'] == 'textarea'): ?>
+        <!-- Main Textarea DIV -->
+        <div
+          id="option-<?= $option['productoption_id']; ?>"
+          class="option">
+          <?php
+          // If required
+          if ($option['required']) : ?>
+            <!-- Required span -->
+            <span class="required">*</span>
+          <?php endif; ?>
+
+          <!-- Option Text in Bold -->
+          <b><?= $this->escape(Text::_($option['option_name'])); ?>:</b>
+
+          <!-- Break -->
+          <br>
+
+          <!-- Textarea -->
+          <textarea
+            name="product_option[<?= $option['productoption_id']; ?>]"
+            cols="20"
+            rows="5">
+            <!-- Text -->
+            <?= $option['optionvalue']; ?>
+          </textarea>
+        </div>
+        <br>
+      <?php endif;
+
+      // Check if the option is a file 
+      if ($option['type'] == 'file') : ?>
+        <!-- Main File Option DIV -->
+        <div
+          id="option-<?= $option['productoption_id']; ?>"
+          class="option">
+          <?php
+
+          // If option is required
+          if ($option['required']) : ?>
+            <!-- Required span -->
+            <span class="required">*</span>
+          <?php endif; ?>
+
+          <!-- Option Text in bold -->
+          <b><?= $this->escape(Text::_($option['option_name'])); ?>:</b>
+
+          <!-- Break -->
+          <br>
+
+          <!-- Upload Button -->
+          <button
+            type="button"
+            id="product-option-<?= $option['productoption_id']; ?>"
+            data-loading-text="<?= Text::_('J2STORE_LOADING') ?>"
+            class="btn btn-default">
+            <!-- Button Icon -->
+            <i class="fa fa-upload"></i>
+
+            <!-- Button Text -->
+            <?= Text::_('J2STORE_PRODUCT_OPTION_CHOOSE_FILE') ?>
+          </button>
+
+          <!-- Hidden field to store file data -->
+          <input
+            type="hidden"
+            name="product_option[<?= $option['productoption_id']; ?>]"
+            value="" id="input-option<?= $option['productoption_id']; ?>" />
+        </div>
+        <br>
+
+      <?php endif;
+
+      // Check if the option is a date
+      if ($option['type'] == 'date') :
+        // Generate unique date picker class
+        $element_date = 'j2store_date_' . $option['productoption_id']; ?>
+
+        <!-- Main Date Picker DIV -->
+        <div
+          id="option-<?= $option['productoption_id']; ?>"
+          class="option">
+          <?php
+
+          // If required
+          if ($option['required']) : ?>
+            <!-- Required span -->
+            <span class="required">*</span>
+          <?php endif; ?>
+
+          <!-- Option Text in bold -->
+          <b><?= $this->escape(Text::_($option['option_name'])); ?>:</b>
+
+          <!-- Break -->
+          <br>
+
+          <!-- Date Input Field -->
+          <input
+            type="text"
+            name="product_option[<?= $option['productoption_id']; ?>]"
+            value="<?= $option['optionvalue']; ?>"
+            class="<?= $element_date; ?>" />
+        </div>
+        <br>
         <?php
-			$text_option_params = $platform->getRegistry($option ['option_params']);
-			?>
-         <!-- text -->
-        <div id="option-<?php echo $option['productoption_id']; ?>" class="option">
-          <?php if ($option['required']) { ?>
-          <span class="required">*</span>
-          <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
-          <input type="text" name="product_option[<?php echo $option['productoption_id']; ?>]" value="<?php echo $option['optionvalue']; ?>" placeholder="<?php echo $text_option_params->get('place_holder','');?>" />
+
+        // Initializing datepicker
+        J2StoreStrapper::addDatePicker(
+          $element_date,
+          $option['option_params']
+        ); ?>
+      <?php endif;
+
+      // Check if the option is a date time
+      if ($option['type'] == 'datetime') :
+        // Generate unique class name
+        $element_datetime = 'j2store_datetime_' . $option['productoption_id']; ?>
+        <!-- Main Datetime Option DIV -->
+        <div
+          id="option-<?= $option['productoption_id']; ?>"
+          class="option">
+          <?php
+
+          // If required
+          if ($option['required']) : ?>
+            <!-- Required span -->
+            <span class="required">*</span>
+          <?php endif; ?>
+
+          <!-- Option Text in bold -->
+          <b><?= Text::_($option['option_name']); ?>:</b>
+
+          <!-- Break -->
+          <br>
+
+          <!-- Datetime INput field -->
+          <input
+            type="text"
+            name="product_option[<?= $option['productoption_id']; ?>]"
+            value="<?= $option['optionvalue']; ?>"
+            class="<?= $element_datetime; ?>" />
         </div>
         <br>
-        <?php } ?>
+        <?php
 
+        // Initializing datetime picker
+        J2StoreStrapper::addDateTimePicker(
+          $element_datetime,
+          $option['option_params']
+        ); ?>
+      <?php endif;
 
-        <?php if ($option['type'] == 'textarea') { ?>
-         <!-- textarea -->
-        <div id="option-<?php echo $option['productoption_id']; ?>" class="option">
-          <?php if ($option['required']) { ?>
-          <span class="required">*</span>
-          <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
-          <textarea name="product_option[<?php echo $option['productoption_id']; ?>]" cols="20" rows="5"><?php echo $option['optionvalue']; ?></textarea>
+      // Check if the option is a time
+      if ($option['type'] == 'time') : ?>
+        <!-- Main Time Option DIV -->
+        <div
+          id="option-<?= $option['productoption_id']; ?>"
+          class="option">
+          <?php
+
+          // If required
+          if ($option['required']) : ?>
+            <!-- Required span -->
+            <span class="required">*</span>
+          <?php endif; ?>
+
+          <!-- Option Text in bold -->
+          <b><?= Text::_($option['option_name']); ?>:</b>
+
+          <!-- Break -->
+          <br>
+
+          <!-- Time input field -->
+          <input
+            type="text"
+            name="product_option[<?= $option['productoption_id']; ?>]" value="<?= $option['optionvalue']; ?>"
+            class="j2store_time" />
         </div>
         <br>
-        <?php } ?>
+      <?php endif;
 
+      // Event Hook: Render plugins after content is displayed
+      echo J2Store::plugin()->eventWithHtml(
+        'AfterDisplaySingleProductOption',
+        array(
+          $this->product,
+          $option
+        )
+      ); ?>
 
-           <?php if ($option['type'] == 'file') { ?>
-                <!-- File -->
-	<div id="option-<?php echo $option['productoption_id']; ?>"
-		class="option">
-          <?php if ($option['required']) { ?>
-          <span class="required">*</span>
-          <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
-		<button type="button"
-			id="product-option-<?php echo $option['productoption_id']; ?>"
-			data-loading-text="<?php echo JText::_('J2STORE_LOADING')?>"
-			class="btn btn-default">
-			<i class="fa fa-upload"></i> <?php echo JText::_('J2STORE_PRODUCT_OPTION_CHOOSE_FILE')?></button>
-		<input type="hidden"
-			name="product_option[<?php echo $option['productoption_id']; ?>]"
-			value="" id="input-option<?php echo $option['productoption_id']; ?>" />
+      <!-- Creating additional child option containers -->
+      <div id="ChildOptions<?= $option['productoption_id']; ?>"></div>
 
-	</div>
-	<br>
+    <?php endforeach; ?>
 
+    <!-- Creating additional child option containers -->
+    <!-- 
+    // !POSSIBLE TYPO 
+    -->
+    <div id="ChildOptio<?= $option['productoption_id']; ?>"></div>
+  </div>
+  <?php endif;
 
-        <?php } ?>
+// Check if there are any product options
+if (isset($options) && !empty($options)):
+  // Loop through all the options
+  foreach ($options as $option) :
+    // If the option is a file
+    if ($option['type'] == 'file'):  ?>
+      <script type="text/javascript">
+        // Handle file uploads
+        (function($) {
+          // Trigger file upload on button click
+          $('#product-option-<?= $option['productoption_id']; ?>')
+            .on('click', function() {
+              // Get this object
+              var node = this;
 
+              // Remove existing form
+              $('#form-upload').remove();
 
+              // Create hidden input field
+              $('body').prepend( /*html*/ `
+              <form 
+                enctype="multipart/form-data" id="form-upload" 
+                style="display: none;">
+                <input 
+                  type="file" 
+                  name="file" />
+              </form>`);
 
-        <?php if ($option['type'] == 'date') { ?>
-        <?php $element_date = 'j2store_date_' . $option ['productoption_id']; ?>
-          <!-- date -->
-        <div id="option-<?php echo $option['productoption_id']; ?>" class="option">
-          <?php if ($option['required']) { ?>
-          <span class="required">*</span>
-          <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
-          <input type="text" name="product_option[<?php echo $option['productoption_id']; ?>]" value="<?php echo $option['optionvalue']; ?>" class="<?php echo $element_date; ?>" />
-        </div>
-        <br>
-   		<?php J2StoreStrapper::addDatePicker($element_date, $option ['option_params']); ?>     
-        <?php } ?>
+              // Trigger file selection dialogue
+              $('#form-upload input[name=\'file\']').trigger('click');
 
+              // Check at an interval if the file has been chosen
+              timer = setInterval(function() {
+                // Check if file has been selected
+                if (
+                  $('#form-upload input[name=\'file\']').val() != ''
+                ) {
+                  // If selected clear interval
+                  clearInterval(timer);
 
-        <?php if ($option['type'] == 'datetime') { ?>
-        <?php $element_datetime = 'j2store_datetime_' . $option ['productoption_id']; ?>
-         <!-- datetime -->
-        <div id="option-<?php echo $option['productoption_id']; ?>" class="option">
-          <?php if ($option['required']) { ?>
-          <span class="required">*</span>
-          <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
-          <input type="text" name="product_option[<?php echo $option['productoption_id']; ?>]" value="<?php echo $option['optionvalue']; ?>" class="<?php echo $element_datetime; ?>" />
-        </div>
-        <br>
-        <?php J2StoreStrapper::addDateTimePicker($element_datetime, $option ['option_params']); ?>                 
-        <?php } ?>
+                  // Request an upload file
+                  $.ajax({
+                    url: 'index.php?option=com_j2store&view=carts&task=upload&product_id=' + <?= $this->product->j2store_product_id; ?>,
+                    type: 'post',
+                    dataType: 'json',
+                    data: new FormData($('#form-upload')[0]),
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function() {
+                      // SHow loading state
+                      $(node).button('loading');
+                    },
+                    complete: function() {
+                      // Reset Button
+                      $(node).button('reset');
+                    },
+                    success: function(json) {
+                      // Remove previous messages
+                      $('.j2file-upload-response').remove();
 
-        <?php if ($option['type'] == 'time') { ?>
-        <!-- time -->
-        <div id="option-<?php echo $option['productoption_id']; ?>" class="option">
-          <?php if ($option['required']) { ?>
-          <span class="required">*</span>
-          <?php } ?>
-          <b><?php echo $this->escape(JText::_($option['option_name'])); ?>:</b><br>
-          <input type="text" name="product_option[<?php echo $option['productoption_id']; ?>]" value="<?php echo $option['optionvalue']; ?>" class="j2store_time" />
-        </div>
-        <br>
-        <?php } ?>
-        
-        <?php echo J2Store::plugin()->eventWithHtml('AfterDisplaySingleProductOption', array($this->product, $option)); ?>
+                      // If error occurs 
+                      // Display error message
+                      if (json['error']) {
+                        $(node)
+                          .parent()
+                          .find('input')
+                          .after('<span class="j2file-upload-response text-danger">' + json['error'] + '</span>');
+                      }
 
-        	<div id="ChildOptions<?php echo $option['productoption_id']; ?>"></div>
+                      // If successful
+                      // Display success message
+                      if (json['success']) {
+                        // SHow message
+                        $(node)
+                          .parent()
+                          .find('input')
+                          .after('<span class="j2file-upload-response text-success">' + json['success'] + ' </span>');
 
-        <?php } ?>
-        	<div id="ChildOptio<?php echo $option['productoption_id']; ?>"></div>
-      </div>
-      <?php } ?>
-
-
- <?php if(isset($options) && !empty($options)): ?>
-
-<?php foreach ($options as $option) : ?>
-<?php if ($option['type'] == 'file'):  ?>
-<script type="text/javascript">
-(function($){
-$('#product-option-<?php echo $option['productoption_id']; ?>').on('click', function() {
-	var node = this;
-	$('#form-upload').remove();
-	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
-	$('#form-upload input[name=\'file\']').trigger('click');
-	timer = setInterval(function() {
-		if ($('#form-upload input[name=\'file\']').val() != '') {
-			clearInterval(timer);
-			$.ajax({
-				url: 'index.php?option=com_j2store&view=carts&task=upload&product_id='+<?php echo $this->product->j2store_product_id;?>,
-				type: 'post',
-				dataType: 'json',
-				data: new FormData($('#form-upload')[0]),
-				cache: false,
-				contentType: false,
-				processData: false,
-				beforeSend: function() {
-					$(node).button('loading');
-				},
-				complete: function() {
-					$(node).button('reset');
-				},
-				success: function(json) {
-					$('.j2file-upload-response').remove();
-
-					if (json['error']) {
-						$(node).parent().find('input').after('<span class="j2file-upload-response text-danger">' + json['error'] + '</span>');
-					}
-
-					if (json['success']) {
-						$(node).parent().find('input').after('<span class="j2file-upload-response text-success">' + json['success'] + ' </span>');
-						$(node).parent().find('input').attr('value', json['code']);
-					}
-				},
-				error: function(xhr, ajaxOptions, thrownError) {
-					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
-				}
-			});
-		}
-	}, 500);
-});
-})(j2store.jQuery);
-</script>
-<?php endif; ?>
-<?php endforeach; ?>
-<?php endif; ?>
+                        // Update Input field code
+                        $(node)
+                          .parent()
+                          .find('input')
+                          .attr('value', json['code']);
+                      }
+                    },
+                    // Error Handling
+                    error: function(xhr, ajaxOptions, thrownError) {
+                      // Alert user
+                      alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                    }
+                  });
+                }
+              }, 500);
+            });
+        })(j2store.jQuery);
+      </script>
+<?php endif;
+  endforeach;
+endif; ?>

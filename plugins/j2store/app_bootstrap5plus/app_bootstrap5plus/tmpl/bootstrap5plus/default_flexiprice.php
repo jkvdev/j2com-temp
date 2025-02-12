@@ -2,11 +2,11 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
- // Import Joomla packages
+// Import Joomla packages
 use Joomla\CMS\Language\Text;
 
 // No direct access
@@ -75,7 +75,9 @@ if (
 
             // If product is on discount
             // Set class to strike
-            if (isset($this->product->pricing->is_discount_pricing_available)) $class = 'strike'; ?>
+            if (isset(
+                $this->product->pricing->is_discount_pricing_available
+            )) $class = 'strike'; ?>
             <!-- Base price DIV -->
             <div class="base-price <?= $class ?>">
                 <!-- Display price -->

@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -14,8 +14,17 @@ defined('_JEXEC') or die;
 
 // Loading the simple product image Template
 $images = $this->loadTemplate('images');
+
 // Loading the simple product images and passes it through a plugin that may modify the content
-J2Store::plugin()->event('BeforeDisplayImages', array(&$images, $this, 'com_j2store.products.list.bootstrap'));
+J2Store::plugin()->event(
+	'BeforeDisplayImages',
+	array(
+		&$images,
+		$this,
+		'com_j2store.products.list.bootstrap'
+	)
+);
+
 // Displaying the images
 echo $images; ?>
 

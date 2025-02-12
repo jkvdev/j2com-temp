@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -36,8 +36,6 @@ if (isset($this->product->event->afterDisplayTitle)) {
 	// Render plugins
 	echo $this->product->event->afterDisplayTitle;
 }
-
-
 
 // If before content plugins are available
 if (isset($this->product->event->beforeDisplayContent)) {

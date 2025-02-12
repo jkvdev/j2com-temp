@@ -1,82 +1,152 @@
 <?php
+
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  *
  * Bootstrap 2 layout of product detail
  */
+
 // No direct access
 defined('_JEXEC') or die;
 ?>
-<div class="product-<?php echo $this->product->j2store_product_id; ?> <?php echo $this->product->product_type; ?>-product">
+<!-- Configurable product detail container -->
+<div class="product-<?= $this->product->j2store_product_id; ?> <?= $this->product->product_type; ?>-product">
+	<!-- Grid layout -->
 	<div class="row">
+		<!-- 1 / 2 Grid -->
 		<div class="col-sm-6">
-			<?php $images = $this->loadTemplate('images');
-			J2Store::plugin()->event('BeforeDisplayImages', array(&$images, $this, 'com_j2store.products.view.bootstrap'));
+			<?php
+
+			// Load images template
+			$images = $this->loadTemplate('images');
+			// Run plugins before displaying images
+			J2Store::plugin()->event(
+				'BeforeDisplayImages',
+				array(
+					&$images,
+					$this,
+					'com_j2store.products.view.bootstrap'
+				)
+			);
+
+			// Render images
 			echo $images;
 			?>
 		</div>
 
+		<!-- 1 / 2 Grid -->
 		<div class="col-sm-6">
-			<?php echo $this->loadTemplate('title'); ?>
-			<?php if(isset($this->product->source->event->afterDisplayTitle)) : ?>
-				<?php echo $this->product->source->event->afterDisplayTitle; ?>
-			<?php endif;?>
+			<?php
 
+			// Render title
+			echo $this->loadTemplate('title');
+
+			// If there are any after title display plugins
+			if (isset($this->product->source->event->afterDisplayTitle)) {
+				// Run plugins
+				echo $this->product->source->event->afterDisplayTitle;
+			} ?>
+
+			<!-- Price, SKU & Brand Container -->
 			<div class="price-sku-brand-container row">
-                <?php if( J2Store::product()->canShowprice($this->params) ): ?>
-				<div class="col-sm-6">
-				<?php echo $this->loadTemplate('price'); ?>
-				</div>
-                <?php endif; ?>
+				<?php
 
+				// If price is enabled
+				if (J2Store::product()->canShowprice($this->params)): ?>
+					<!-- 1 / 2 Grid -->
+					<div class="col-sm-6">
+						<!-- Render price template -->
+						<?= $this->loadTemplate('price'); ?>
+					</div>
+				<?php endif; ?>
+
+				<!-- 1 / 2 Grid -->
 				<div class="col-sm-6">
-				<?php if(isset($this->product->source->event->beforeDisplayContent)) : ?>
-					<?php echo $this->product->source->event->beforeDisplayContent; ?>
-				<?php endif;?>
-                <?php if( J2Store::product()->canShowSku($this->params) ): ?>
-					<?php echo $this->loadTemplate('sku'); ?>
-                <?php endif; ?>
-					<?php echo $this->loadTemplate('brand'); ?>
-					<?php if($this->params->get('item_show_product_stock', 1) && J2Store::product()->managing_stock($this->product->variant)) : ?>
-						<?php echo $this->loadTemplate('stock'); ?>
-					<?php endif; ?>
+					<?php
+
+					// If there are any plugins before displaying content
+					if (isset($this->product->source->event->beforeDisplayContent)) {
+						// Run plugins
+						echo $this->product->source->event->beforeDisplayContent;
+					}
+
+					// If SKU is enabled
+					if (J2Store::product()->canShowSku($this->params)) {
+						// Render SKU Template
+						echo $this->loadTemplate('sku');
+					}
+
+					// Render brand template
+					echo $this->loadTemplate('brand');
+
+					// If stock management is enabled
+					if (
+						$this->params->get('item_show_product_stock', 1)
+						&& J2Store::product()->managing_stock($this->product->variant)
+					) {
+						// Render stock template
+						echo $this->loadTemplate('stock');
+					} ?>
 				</div>
 			</div>
-			<?php if( J2Store::product()->canShowCart($this->params) ): ?>
-			<form action="<?php echo $this->product->cart_form_action; ?>"
-					method="post" class="j2store-addtocart-form"
-					id="j2store-addtocart-form-<?php echo $this->product->j2store_product_id; ?>"
-					name="j2store-addtocart-form-<?php echo $this->product->j2store_product_id; ?>"
-					data-product_id="<?php echo $this->product->j2store_product_id; ?>"
-					data-product_type="<?php echo $this->product->product_type; ?>"
+
+			<?php
+			// If cart is enabled
+			if (J2Store::product()->canShowCart($this->params)): ?>
+				<!-- Main Add to cart form -->
+				<form
+					action="<?= $this->product->cart_form_action; ?>"
+					method="post"
+					class="j2store-addtocart-form"
+					id="j2store-addtocart-form-<?= $this->product->j2store_product_id; ?>"
+					name="j2store-addtocart-form-<?= $this->product->j2store_product_id; ?>"
+					data-product_id="<?= $this->product->j2store_product_id; ?>"
+					data-product_type="<?= $this->product->product_type; ?>"
 					enctype="multipart/form-data">
 
-				<?php echo $this->loadTemplate('configurableoptions'); ?>
-				<?php echo $this->loadTemplate('cart'); ?>
-
-			</form>
+					<?php
+					// Render product options
+					echo $this->loadTemplate('configurableoptions');
+					// Render cart
+					echo $this->loadTemplate('cart'); ?>
+				</form>
 			<?php endif; ?>
 		</div>
 	</div>
 
-	<?php if($this->params->get('item_use_tabs', 1)): ?>
-		<?php echo $this->loadTemplate('tabs'); ?>
-	<?php else: ?>
-		<?php echo $this->loadTemplate('notabs'); ?>
-	<?php endif; ?>
-	
-	<?php if(isset($this->product->source->event->afterDisplayContent)) : ?>
-		<?php echo $this->product->source->event->afterDisplayContent; ?>
-	<?php endif;?>
-</div>	
+	<?php if ($this->params->get('item_use_tabs', 1)) {
+		// Render tabs template
+		echo $this->loadTemplate('tabs');
+	} else {
+		// Default: Render no tabs template
+		echo $this->loadTemplate('notabs');
+	}
 
-	<?php if($this->params->get('item_show_product_upsells', 0) && count($this->up_sells)): ?>
-			<?php echo $this->loadTemplate('upsells'); ?>
-	<?php endif;?>
+	// If after display content plugins exist
+	if (isset($this->product->source->event->afterDisplayContent)) {
+		// Run plugins
+		echo $this->product->source->event->afterDisplayContent;
+	} ?>
+</div>
 
-	<?php if($this->params->get('item_show_product_cross_sells', 0) && count($this->cross_sells)): ?>
-			<?php echo $this->loadTemplate('crosssells'); ?>
-	<?php endif;?>
+<?php
 
+// If up sells are enabled
+if (
+	$this->params->get('item_show_product_upsells', 0)
+	&& count($this->up_sells)
+) {
+	// render up sells template
+	echo $this->loadTemplate('upsells');
+}
+
+//  If cross sells are enabled
+if (
+	$this->params->get('item_show_product_cross_sells', 0)
+	&& count($this->cross_sells)
+) {
+	// Render cross sells template
+	echo $this->loadTemplate('crosssells');
+} ?>

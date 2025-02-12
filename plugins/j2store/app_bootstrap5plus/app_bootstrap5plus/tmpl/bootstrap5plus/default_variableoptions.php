@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -71,7 +71,9 @@ if ($options): ?>
               $checked = '';
 
               // Check if option is set by default
-              if ($option_value['product_optionvalue_default']) $checked = 'selected="selected"'; ?>
+              if (
+                $option_value['product_optionvalue_default']
+              ) $checked = 'selected="selected"'; ?>
 
               <!-- Option -->
               <option
@@ -107,7 +109,6 @@ if ($options): ?>
 
           <!-- Break -->
           <br>
-
           <?php
 
           // Loop over all option values
@@ -116,7 +117,9 @@ if ($options): ?>
             $checked = '';
 
             // Check if it is set by default
-            if ($option_value['product_optionvalue_default']) $checked = 'checked="checked"'; ?>
+            if (
+              $option_value['product_optionvalue_default']
+            ) $checked = 'checked="checked"'; ?>
 
             <!-- Radio Button -->
             <input
@@ -132,7 +135,6 @@ if ($options): ?>
               <?= $option_value['product_optionvalue_attribs']; ?> />
 
             <?php
-
             // If radio button has an image, render it
             if (
               $this->params->get('image_for_product_options', 0) &&

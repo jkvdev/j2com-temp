@@ -2,7 +2,7 @@
 
 /**
  * @package J2Store
- * @copyright Copyright (c)2014-17 Ramesh Elamathi / J2Store.org
+ * @copyright Copyright (c)2025 Valentin Costea / J2Store.org
  * @license GNU GPL v3 or later
  */
 
@@ -82,7 +82,9 @@ if ($options): ?>
               $checked = '';
 
               // If the option has a default value it is pre selected
-              if ($option_value['product_optionvalue_default']) $checked = 'selected="selected"'; ?>
+              if (
+                $option_value['product_optionvalue_default']
+              ) $checked = 'selected="selected"'; ?>
 
               <!-- Render dropdown option -->
               <option
@@ -159,13 +161,17 @@ if ($options): ?>
             $checked = '';
 
             // Check if it is set by default
-            if ($option_value['product_optionvalue_default']) $checked = 'checked="checked"'; ?>
+            if (
+              $option_value['product_optionvalue_default']
+            ) $checked = 'checked="checked"'; ?>
 
             <!-- Radio Button Input -->
             <input
               <?= $checked; ?>
               type="radio"
-              name="product_option[<?= $option['productoption_id']; ?>]" value="<?= $option_value['product_optionvalue_id']; ?>" id="option-value-<?= $option_value['product_optionvalue_id']; ?>"
+              name="product_option[<?= $option['productoption_id']; ?>]"
+              value="<?= $option_value['product_optionvalue_id']; ?>"
+              id="option-value-<?= $option_value['product_optionvalue_id']; ?>"
               onChange="doAjaxFilter(
           						this.value,
           						<?= $product_id ?>,
@@ -343,6 +349,7 @@ if ($options): ?>
           id="option-<?= $option['productoption_id']; ?>"
           class="option">
           <?php
+
           // If field is required
           if ($option['required']) : ?>
             <!-- Required span -->
@@ -602,6 +609,7 @@ if (isset($options) && !empty($options)):
 
               // Check at an interval if the file has been chosen
               timer = setInterval(function() {
+                // Check if file has been selected
                 if (
                   $('#form-upload input[name=\'file\']').val() != '' &&
                   $('#form-upload input[name=\'file\']').val() != undefined
@@ -666,6 +674,6 @@ if (isset($options) && !empty($options)):
             });
         })(j2store.jQuery);
       </script>
-    <?php endif; ?>
-  <?php endforeach; ?>
-<?php endif; ?>
+<?php endif;
+  endforeach;
+endif; ?>
