@@ -133,7 +133,7 @@ if (
     <!-- Additional images DIV -->
     <div class="j2store-product-additional-images my-3">
       <!-- Image list -->
-      <ul class="additional-image-list p-0 d-flex gap-3">
+      <ul class="additional-image-list p-0 m-0 d-flex gap-3">
         <?php
 
         // Loop through all images
@@ -157,7 +157,7 @@ if (
               onclick="setMainPreview('addimage-<?= $this->product->j2store_product_id; ?>-<?= $key; ?>', <?= $this->product->j2store_product_id; ?>, <?= $this->params->get('item_enable_image_zoom', 1); ?>, 'inner')">
               <img
                 id="addimage-<?= $this->product->j2store_product_id; ?>-<?= $key; ?>"
-                class="j2store-item-additionalimage-preview j2store-img-responsive object-fit-contain img-fluid d-block m-0 p-0"
+                class="j2store-item-additionalimage-preview j2store-img-responsive object-fit-contain img-fluid d-block m-auto p-0 w-100"
                 style="max-width: 100%; max-height: 100%;"
                 alt="<?= (isset($additional_images_alt[$key])
                         && !empty($additional_images_alt[$key]))
@@ -201,7 +201,7 @@ if (
              -->
             <img
               id="additial-main-image-<?= $this->product->j2store_product_id; ?>"
-              class="j2store-item-additionalimage-preview j2store-img-responsive additional-mainimage object-fit-contain img-fluid d-block m-0 p-0"
+              class="j2store-item-additionalimage-preview j2store-img-responsive additional-mainimage object-fit-contain img-fluid d-block m-0 p-0 w-100"
               style="max-width: 100%; max-height: 100%;"
               alt="<?= (!empty($this->product->main_image_alt))
                       ? $this->escape($this->product->main_image_alt)
