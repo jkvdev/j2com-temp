@@ -18,3 +18,7 @@ The repository is organized as follows:
 - **Customizable Product Display**: Provides multiple options for displaying products and categories on the frontend, including grid and list views.
 - **Advanced Cart and Checkout**: Offers a fully-featured shopping cart and secure checkout process with various payment gateway integrations.
 - **Custom Fields**: Allows you to add custom fields to products and checkout forms for a tailored eCommerce experience.
+
+## Sass command
+
+sass --watch template.scss:../css/template.min.css --style compressed

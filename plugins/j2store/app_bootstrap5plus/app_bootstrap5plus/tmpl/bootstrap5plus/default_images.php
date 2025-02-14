@@ -29,7 +29,7 @@ if ($this->params->get('list_show_image', 1)):
       <!-- Main Thumbnail Image Div -->
       <div
         class="j2store-thumbnail-image w-100 h-100 d-flex justify-content-center align-center"
-        style="max-width: 360px; max-height: 200px;">
+        style="max-width: 600px; max-height: 200px;">
         <?php
         // Retrieving Thumbnail image path
         $thumb_image = $platform->getImagePath($this->product->thumb_image);
@@ -47,12 +47,13 @@ if ($this->params->get('list_show_image', 1)):
             -->
             <!-- Rendering thumbnail image -->
             <!-- Gathering alt and title tag information, if not set to product name -->
+            <!-- width="<?= (int)$this->params->get('list_image_thumbnail_width', '200'); ?>" -->
             <img
               alt="<?= (!empty($this->product->thumb_image_alt)) ? $this->escape($this->product->thumb_image_alt) : $this->escape($this->product->product_name); ?>"
               title="<?= $this->escape($this->product->product_name); ?>"
               class="j2store-img-responsive j2store-product-thumb-image-<?= $this->product->j2store_product_id; ?> w-100 h-100 object-fit-cover"
               src="<?= $thumb_image ?>"
-              width="<?= (int)$this->params->get('list_image_thumbnail_width', '200'); ?>"
+
               style="object-fit: cover; transition: transform 0.3s ease-in-out;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" />
             <?php
             // Check if the thumbnail has a link
