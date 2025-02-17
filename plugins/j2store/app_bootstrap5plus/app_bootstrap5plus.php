@@ -7,9 +7,19 @@
  */
 
 /** ensure this file is being included by a parent file */
+// Restrict Access to this file
 defined('_JEXEC') or die('Restricted access');
 // Include base plugin class only once
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/library/plugins/app.php');
+
+// Import Joomla packages
+use Joomla\CMS\Language\Text;
+// use Joomla\CMS\Factory;
+// use Joomla\CMS\Plugin\PluginManager;
+use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\Registry\Registry;
+use Joomla\CMS\Toolbar\ToolbarHelper;
+
 
 // Create new class to extend base plugin
 class plgJ2StoreApp_bootstrap5plus extends J2StoreAppPlugin
@@ -48,6 +58,8 @@ class plgJ2StoreApp_bootstrap5plus extends J2StoreAppPlugin
     return true;
   }
 
+  protected $paramsLoaded = false; // Important: Initialize to false
+
   /**
    * Validates the data submitted based on the suffix provided
    * A controller for this plugin, you could say
@@ -69,17 +81,45 @@ class plgJ2StoreApp_bootstrap5plus extends J2StoreAppPlugin
     );
 
     // Toolbar Title
-    JToolBarHelper::title(JText::_('J2STORE_APP') . '-' . JText::_('PLG_J2STORE_' . strtoupper($this->_element)), 'j2store-logo');
+    ToolbarHelper::title(
+      Text::_('J2STORE_APP') . '-' . Text::_('PLG_J2STORE_' . strtoupper((string) $this->_element)),
+      'j2store-logo'
+    );
     // Back button
-    JToolBarHelper::back('J2STORE_BACK_TO_DASHBOARD', 'index.php?option=com_j2store');
+    ToolbarHelper::back(
+      'J2STORE_BACK_TO_DASHBOARD',
+      'index.php?option=com_j2store'
+    );
 
-    var_dump($this->params);
+    // var_dump($this->params);
 
     // Prepare data for the view
     // Create new stdClass object to store template variables
     $vars = new \stdClass();
     // Convert plugin params into an array
-    $data = $this->params->toArray();
+
+    // Todo: check when passing params, for now it's empty
+    // old version
+    // $data = $this->params->toArray();
+
+    // Joomla 4+ version
+    // Get plugin instance
+    $plugin = PluginHelper::getPlugin(
+      'j2store',
+      'app_bootstrap5plus'
+    );
+
+    // If plugin exists
+    if ($plugin) {
+      // Load the parameters
+      $params = new Registry($plugin->params);
+    }
+
+    // Set data
+    $data = $params->toArray();
+
+    // TODO: End todo here
+    // var_dump($data);
     // Create a new data array
     $newdata = array();
     // Wrap parameters inside the new data array
