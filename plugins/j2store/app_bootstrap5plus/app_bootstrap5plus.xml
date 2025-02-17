@@ -1,16 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension version="3.0" type="plugin" group="j2store" method="upgrade">
+<extension type="plugin" group="j2store" method="upgrade">
     <name>Product view - Bootstrap 5+</name>
-    <version>1.0.0</version>
-    <creationDate>Jan 2025</creationDate>
+    <version>4.0.0</version>
+    <creationDate>FEB 2025</creationDate>
     <author>Valentin Costea</author>
     <authorEmail>jkv21contact@gmail.com</authorEmail>
     <authorUrl>https://www.j2store.org</authorUrl>
-    <copyright>2021 J2Store</copyright>
+    <copyright>2025 J2Store</copyright>
     <license>GNU General Public License v3 or later</license>
     <description>Product view for Bootstrap 5+</description>
     <files>
         <filename plugin="app_bootstrap5plus">app_bootstrap5plus.php</filename>
         <folder>app_bootstrap5plus</folder>
     </files>
+    <media folder="media" destination="plg_j2store_app_bootstrap5plus">
+		<folder>images</folder>
+	</media>
+    <updateservers>
+		<server type="extension" priority="2" name="J2Commerce Bootstrap 5 Material">https://updates.j2commerce.com/j2store/plg_j2store_app_bootstrap5plus.xml</server>
+	</updateservers>
+    <languages>
+		<language tag="en-GB">languages/en-GB.plg_j2store_app_bootstrap5plus.ini</language>
+		<language tag="en-GB">languages/en-GB.plg_j2store_app_bootstrap5plus.sys.ini</language>
+	</languages>
+    <config>
+		<fields name="params">
+			<fieldset name="basic" label="J2STORE_BASIC">
+            <field 
+                name="myradiovalue" 
+                type="radio" 
+                default="0" 
+                label="Select an option" 
+                description=""
+                layout="joomla.form.field.radio.switcher">
+                <option value="0">JNo</option>
+                <option value="1">JYes</option>
+            </field>
+            
+			</fieldset>
+		</fields>
+	</config>
 </extension>

@@ -6,265 +6,269 @@
  * @license GNU GPL v3 or later
  */
 
-//  Ensure this file is included by a parent file
-// Give no direct access permissions
+/** ensure this file is being included by a parent file */
 defined('_JEXEC') or die('Restricted access');
-
-// Require plugin instance only once
+// Include base plugin class only once
 require_once(JPATH_ADMINISTRATOR . '/components/com_j2store/library/plugins/app.php');
 
-// Import Joomla packages
-use Joomla\CMS\Language\Text;
-use Joomla\CMS\Toolbar\Toolbar;
-
-// Class definition that extends the default class
+// Create new class to extend base plugin
 class plgJ2StoreApp_bootstrap5plus extends J2StoreAppPlugin
 {
-    /**
-     * @var $_element  string  Should always correspond with the plugin's filename,
-     * forcing it to be unique
-     */
-    // Get unique plugin name / identifier
-    var $_element   = 'app_bootstrap5plus';
+  /**
+   * @var $_element  string  
+   * Should always correspond with the plugin's filename, forcing it to be unique     
+   */
+  var $_element   = 'app_bootstrap5plus';
 
-    /**
-     * Overriding
-     *
-     * @param $row
-     * @return string
-     */
-    // Check if the current app is this plugin
-    function onJ2StoreGetAppView($row)
-    {
-        // Ensure function only runs for this plugin
-        if (!$this->_isMe($row)) {
-            return null;
-        }
-        // Run View List function
-        return $this->viewList();
+  /**
+   * Overriding
+   *
+   * @param $row
+   * @return string
+   */
+  // Get the J2Store view list
+  function onJ2StoreGetAppView($row)
+  {
+    // If this is not an instance of this plugin
+    if (!$this->_isMe($row)) {
+      return null;
     }
 
-    // Check if J2STore version 4 is being used
-    function onJ2StoreIsJ2Store4($element)
-    {
-        if (!$this->_isMe($element)) {
-            return null;
-        }
-        return true;
+    // Get the view list
+    return $this->viewList();
+  }
+
+  // Check if Joomla version 4 is being used
+  function onJ2StoreIsJ2Store4($element)
+  {
+    // If this is not an instance of this plugin
+    if (!$this->_isMe($element)) {
+      return null;
+    }
+    return true;
+  }
+
+  /**
+   * Validates the data submitted based on the suffix provided
+   * A controller for this plugin, you could say
+   * @return string
+   */
+  // Get and parse data
+  function viewList()
+  {
+    // Get application instance
+    $app = J2Store::platform()->application();
+
+    // Model should always be a plural / end in an extra s
+    // Load the custom model
+    $this->includeCustomModel('AppBootstrap5pluss');
+    // Create and extended version of the model
+    $model = F0FModel::getTmpInstance(
+      'AppBootstrap5pluss',
+      'J2StoreModel'
+    );
+
+    // Toolbar Title
+    JToolBarHelper::title(JText::_('J2STORE_APP') . '-' . JText::_('PLG_J2STORE_' . strtoupper($this->_element)), 'j2store-logo');
+    // Back button
+    JToolBarHelper::back('J2STORE_BACK_TO_DASHBOARD', 'index.php?option=com_j2store');
+
+    var_dump($this->params);
+
+    // Prepare data for the view
+    // Create new stdClass object to store template variables
+    $vars = new \stdClass();
+    // Convert plugin params into an array
+    $data = $this->params->toArray();
+    // Create a new data array
+    $newdata = array();
+    // Wrap parameters inside the new data array
+    $newdata['params'] = $data;
+    // Get the form from the model
+    $form = $model->getForm($newdata);
+    // Store the form inside the variables
+    $vars->form = $form;
+
+    // Get HTTP Integer ID
+    $id = $app->input->getInt('id', '0');
+    // Save the ID
+    $vars->id = $id;
+
+    // Render the view
+    return $this->_getLayout('default', $vars);
+  }
+
+  // Decode html special characters
+  public function escape($var)
+  {
+    return htmlspecialchars_decode($var, ENT_COMPAT);
+  }
+
+  // Modify folder structure
+  function onJ2StoreTemplateFolderList(&$folder)
+  {
+    // If main folder does not exist 
+    if (!in_array('bootstrap5plus', $folder)) {
+      // Add folder
+      $folder[] = 'bootstrap5plus';
     }
 
-    /**
-     * Validates the data submitted based on the suffix provided
-     * A controller for this plugin, you could say
-     * @return string
-     */
+    // If tag folder doesn't exist
+    if (!in_array('tag_bootstrap5plus', $folder)) {
+      // Add folder
+      $folder[] = 'tag_bootstrap5plus';
+    }
+  }
 
-    //  Main View List function
-    function viewList()
-    {
-        // Get J2Store application instance
-        $app = J2Store::platform()->application();
+  // Modify product list output
+  function onJ2StoreViewProductListHtml(&$view_html, &$view, $model)
+  {
+    // Ignore all errors
+    F0FPlatform::getInstance()->setErrorHandling(E_ALL, 'ignore');
+    // Get template path
+    $view = $this->setTemplatePath($view);
+    // Load template
+    $result = $view->loadTemplate();
 
-        // Create and configure the Toolbar
-        $toolbar = Toolbar::getInstance('toolbar');
-        // Generate admin UI
-        $toolbar->title(
-            Text::_('J2STORE_APP') .
-                '-' .
-                Text::_('PLG_J2STORE_' .
-                    strtoupper((string) $this->_element)),
-            'j2store-logo'
-        );
-        // Add back button to Joomla admin toolbar
-        $toolbar->back(
-            'J2STORE_BACK_TO_DASHBOARD',
-            'index.php?option=com_j2store'
-        );
+    // If an exception occurs
+    if ($result instanceof Exception) {
+      // Handle error
+      F0FPlatform::getInstance()->raiseError(
+        $result->getCode(),
+        $result->getMessage()
+      );
 
-        // Create an object to store variables and load backend layout
-        $vars = new \stdClass();
-        $id = $app->input->getInt('id', '0');
-        $vars->id = $id;
-        return $this->_getLayout('backend', $vars);
+      // Return error message
+      return $result;
     }
 
-    // Decode special characters
-    public function escape($var)
-    {
-        return htmlspecialchars_decode($var, ENT_COMPAT);
+    // Get final html output
+    $view_html = $result;
+  }
+
+  // Modify the template search paths
+  function setTemplatePath($view, $default = 'bootstrap5plus')
+  {
+    // Get Joomla application instance
+    $app = J2Store::platform()->application();
+    // Define DIrectory Separator (DS) if not already defined
+    if (!defined('DS')) define('DS', DIRECTORY_SEPARATOR);
+
+    // Add default template path
+    $view->addTemplatePath(
+      JPATH_SITE . DS . 'plugins' . DS . 'j2store' . DS . $this->_element . DS . $this->_element . DS . 'tmpl' . DS . $default
+    );
+
+    // Add Joomla Template Override Paths
+    $view->addTemplatePath(
+      JPATH_SITE . DS . 'templates' . DS . $app->getTemplate() . DS . 'html' . DS . 'com_j2store' . DS . 'templates'
+    );
+    $view->addTemplatePath(
+      JPATH_SITE . DS . 'templates' . DS . $app->getTemplate() . DS . 'html' . DS . 'com_j2store' . DS . 'templates' . DS . $default
+    );
+
+    // Add Joomla default overrides
+    $view->addTemplatePath(
+      JPATH_SITE . DS . 'templates' . DS . $app->getTemplate() . DS . 'html' . DS . 'com_j2store' . DS . $default
+    );
+    $view->addTemplatePath(
+      JPATH_SITE . DS . 'templates' . DS . $app->getTemplate() . DS . 'html' . DS . 'com_j2store'
+    );
+
+    // Add Paths for custom J2Store sub templates
+    if ($view->params->get('subtemplate')) {
+      // If a sub template is specified add paths for it.
+      $view->addTemplatePath(
+        JPATH_SITE . DS . 'templates' . DS . $app->getTemplate() . DS . 'html' . DS . 'com_j2store' . DS . 'templates' . DS . $view->params->get('subtemplate')
+      );
+      $view->addTemplatePath(
+        JPATH_SITE . DS . 'templates' . DS . $app->getTemplate() . DS . 'html' . DS . 'com_j2store' . DS . $view->params->get('subtemplate')
+      );
     }
 
-    // Managing template folders
-    function onJ2StoreTemplateFolderList(&$folder)
-    {
-        // If bootstrap5plus folder exists
-        if (!in_array('bootstrap5plus', $folder)) {
-            // Add folder to J2Store's template folders
-            $folder[] = 'bootstrap5plus';
-        }
+    // Return the modified view
+    return $view;
+  }
 
-        // If tag_bootstrap5plus folder exists
-        if (!in_array('tag_bootstrap5plus', $folder)) {
-            // Add folder to J2Store's template folders
-            $folder[] = 'tag_bootstrap5plus';
-        }
+  // Modify product list tag view
+  function onJ2StoreViewProductListTagHtml(&$view_html, &$view, $model)
+  {
+    // Ignore errors
+    F0FPlatform::getInstance()->setErrorHandling(E_ALL, 'ignore');
+    // Get the template path
+    $view = $this->setTemplatePath($view, 'tag_bootstrap5plus');
+    // Load the template
+    $result = $view->loadTemplate();
+
+    // If an exception occurs
+    if ($result instanceof Exception) {
+      // Handle error
+      F0FPlatform::getInstance()->raiseError(
+        $result->getCode(),
+        $result->getMessage()
+      );
+
+      // Return error message
+      return $result;
     }
 
-    // Override product list template with bootstrap 5 plus
-    function onJ2StoreViewProductListHtml(&$view_html, &$view, $model)
-    {
-        // Ignore all errors
-        F0FPlatform::getInstance()->setErrorHandling(
-            E_ALL,
-            'ignore'
-        );
-        // Get template
-        $view = $this->setTemplatePath($view);
-        // Load template
-        $result = $view->loadTemplate();
+    // Get final html output
+    $view_html = $result;
+  }
 
-        // If errors exists
-        if ($result instanceof Exception) {
-            // Generate and show error message
-            F0FPlatform::getInstance()->raiseError(
-                $result->getCode(),
-                $result->getMessage()
-            );
+  // Modify html output of product details page
+  function onJ2StoreViewProductHtml(&$view_html, &$view, $model)
+  {
+    // Use the view.php layout file
+    $view->setLayout('view');
+    // Ignore all errors
+    F0FPlatform::getInstance()->setErrorHandling(E_ALL, 'ignore');
+    // Set the correct template path
+    $view = $this->setTemplatePath($view);
+    // Load the template
+    $result = $view->loadTemplate();
 
-            return $result;
-        }
+    // If exception occurs
+    if ($result instanceof Exception) {
+      // Handle error
+      F0FPlatform::getInstance()->raiseError(
+        $result->getCode(),
+        $result->getMessage()
+      );
 
-        // Get the html result
-        $view_html = $result;
+      // Return error message
+      return $result;
     }
 
-    // Define template path
-    function setTemplatePath($view, $default = 'bootstrap5plus')
-    {
-        // Get application Instance
-        $app = J2Store::platform()->application();
-        // If directory separator is not defined, define one
-        if (!defined('DS')) define('DS', DIRECTORY_SEPARATOR);
+    // Get final html output
+    $view_html = $result;
+  }
 
-        // Look for template files in component folders
-        $view->addTemplatePath(
-            JPATH_SITE . DS . 'plugins' . DS . 'j2store' . DS . $this->_element . DS . $this->_element . DS . 'tmpl' . DS . $default
-        );
+  // Modify html output of product details tag page
+  function onJ2StoreViewProductTagHtml(&$view_html, &$view, $model)
+  {
+    // Use the view.php layout file
+    $view->setLayout('view');
+    // Ignore all errors
+    F0FPlatform::getInstance()->setErrorHandling(E_ALL, 'ignore');
+    // Set the correct template path
+    $view = $this->setTemplatePath($view, 'tag_bootstrap5plus');
+    // Load template
+    $result = $view->loadTemplate();
 
-        // Look for overrides in template folder (J2 template structure)
-        $view->addTemplatePath(
-            JPATH_SITE . DS . 'templates' . DS . $app->getTemplate() . DS . 'html' . DS . 'com_j2store' . DS . 'templates'
-        );
-        $view->addTemplatePath(
-            JPATH_SITE . DS . 'templates' . DS . $app->getTemplate() . DS . 'html' . DS . 'com_j2store' . DS . 'templates' . DS . $default
-        );
+    // If exception occurs
+    if ($result instanceof Exception) {
+      // Handle error
+      F0FPlatform::getInstance()->raiseError(
+        $result->getCode(),
+        $result->getMessage()
+      );
 
-        // Look for overrides in template folder (Joomla! template structure)
-        $view->addTemplatePath(
-            JPATH_SITE . DS . 'templates' . DS . $app->getTemplate() . DS . 'html' . DS . 'com_j2store' . DS . $default
-        );
-        $view->addTemplatePath(
-            JPATH_SITE . DS . 'templates' . DS . $app->getTemplate() . DS . 'html' . DS . 'com_j2store'
-        );
-
-        // Look for specific J2 theme files / sub templates
-        if ($view->params->get('subtemplate')) {
-            // Add sub templates
-            $view->addTemplatePath(
-                JPATH_SITE . DS . 'templates' . DS . $app->getTemplate() . DS . 'html' . DS . 'com_j2store' . DS . 'templates' . DS . $view->params->get('subtemplate')
-            );
-            $view->addTemplatePath(
-                JPATH_SITE . DS . 'templates' . DS . $app->getTemplate() . DS . 'html' . DS . 'com_j2store' . DS . $view->params->get('subtemplate')
-            );
-        }
-        return $view;
+      // Return error message
+      return $result;
     }
 
-    // Override product tag list view
-    function onJ2StoreViewProductListTagHtml(&$view_html, &$view, $model)
-    {
-        // Ignore all errors
-        F0FPlatform::getInstance()->setErrorHandling(
-            E_ALL,
-            'ignore'
-        );
-        // Get template
-        $view = $this->setTemplatePath($view, 'tag_bootstrap5plus');
-        // Load template
-        $result = $view->loadTemplate();
-
-        // If any errors occur
-        if ($result instanceof Exception) {
-            // Generate and show error message
-            F0FPlatform::getInstance()->raiseError(
-                $result->getCode(),
-                $result->getMessage()
-            );
-
-            return $result;
-        }
-
-        // Get html result
-        $view_html = $result;
-    }
-
-    // Override how product views are rendered
-    function onJ2StoreViewProductHtml(&$view_html, &$view, $model)
-    {
-        // Set the layout of the view
-        $view->setLayout('view');
-        // Ignore all errors
-        F0FPlatform::getInstance()->setErrorHandling(
-            E_ALL,
-            'ignore'
-        );
-        // Get the template
-        $view = $this->setTemplatePath($view);
-        // Load the template
-        $result = $view->loadTemplate();
-
-        // If errors occur
-        if ($result instanceof Exception) {
-            // Generate error message
-            F0FPlatform::getInstance()->raiseError(
-                $result->getCode(),
-                $result->getMessage()
-            );
-
-            return $result;
-        }
-
-        // Get html result
-        $view_html = $result;
-    }
-
-    // Override how tag views are rendered
-    function onJ2StoreViewProductTagHtml(&$view_html, &$view, $model)
-    {
-        // Set the layout of the view
-        $view->setLayout('view');
-        // Ignore error messages
-        F0FPlatform::getInstance()->setErrorHandling(
-            E_ALL,
-            'ignore'
-        );
-        // Get the template view
-        $view = $this->setTemplatePath($view, 'tag_bootstrap5plus');
-        // Load template
-        $result = $view->loadTemplate();
-
-        // If errors occur
-        if ($result instanceof Exception) {
-            // Generate error message
-            F0FPlatform::getInstance()->raiseError(
-                $result->getCode(),
-                $result->getMessage()
-            );
-
-            return $result;
-        }
-
-        // Get html result
-        $view_html = $result;
-    }
+    // Get final html output
+    $view_html = $result;
+  }
 }
